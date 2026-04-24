@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import Literal
+from datetime import datetime
 
 
 class SpeciesOut(BaseModel):
@@ -21,3 +23,39 @@ class SeedResponse(BaseModel):
     already_seeded: bool
     species_count: int
     recipes_count: int
+
+
+class MuldoOut(BaseModel):
+    id: int
+    species_name: str
+    generation: int
+    sex: str
+    is_fertile: bool
+    origin: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class InventoryEntry(BaseModel):
+    fertile_f: int
+    fertile_m: int
+    sterile_f: int
+    sterile_m: int
+
+
+class InventoryStats(BaseModel):
+    total_fertile: int
+    total_sterile: int
+    par_gen: dict[str, dict[str, int]]  # gen -> {fertile, sterile}
+
+
+class CaptureRequest(BaseModel):
+    species_name: str
+    sex: Literal["F", "M"]
+
+
+class BulkCaptureRequest(BaseModel):
+    species_name: str
+    sex: Literal["F", "M"]
+    count: int
