@@ -89,8 +89,8 @@ class BreedingLog(Base):
     cycle_number: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    parent_f: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_f_id])
-    parent_m: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_m_id])
+    parent_f: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_f_id], passive_deletes=True)
+    parent_m: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_m_id], passive_deletes=True)
     child: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[child_id])
     target_species: Mapped["MuldoSpecies"] = relationship("MuldoSpecies", foreign_keys=[target_species_id])
 
