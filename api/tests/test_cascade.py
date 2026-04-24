@@ -1,5 +1,6 @@
 import math
 import pytest
+from types import SimpleNamespace
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.services.cascade import compute_cascade
@@ -9,12 +10,10 @@ from app.services.cascade import compute_cascade
 
 def _make_species(id, name, gen):
     """Simple namespace object for testing."""
-    from types import SimpleNamespace
     return SimpleNamespace(id=id, name=name, generation=gen)
 
 
 def _make_recipe(child_id, pf_id, pm_id):
-    from types import SimpleNamespace
     return SimpleNamespace(child_species_id=child_id, parent_f_species_id=pf_id, parent_m_species_id=pm_id)
 
 

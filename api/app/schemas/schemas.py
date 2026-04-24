@@ -87,6 +87,6 @@ class CascadeItem(BaseModel):
     fertile_m: int
     total_owned: int
     remaining: int
-    status: str
+    status: Literal["ok", "en_cours", "a_faire"]
     expected_f: int
     expected_m: int
