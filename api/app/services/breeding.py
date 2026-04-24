@@ -12,11 +12,11 @@ async def _get_current_cycle(db: AsyncSession) -> int:
     return result or 0
 
 
-async def _load_muldo_or_400(db: AsyncSession, muldo_id: int) -> MuldoIndividual:
+async def _load_muldo_or_404(db: AsyncSession, muldo_id: int) -> MuldoIndividual:
     result = await db.execute(select(MuldoIndividual).where(MuldoIndividual.id == muldo_id))
     muldo = result.scalar_one_or_none()
     if muldo is None:
-        raise HTTPException(status_code=400, detail=f"Muldo {muldo_id} not found")
+        raise HTTPException(status_code=404, detail=f"Muldo {muldo_id} not found")
     return muldo
 
 
@@ -54,7 +54,7 @@ async def _run_auto_clone(db: AsyncSession) -> list[dict]:
                 MuldoIndividual.sex == sex,
                 MuldoIndividual.is_fertile == False,  # noqa: E712
             )
-            .order_by(MuldoIndividual.created_at)
+            .order_by(MuldoIndividual.created_at, MuldoIndividual.id)
             .limit(2)
         )
         victims = list(victims_result.scalars())
@@ -69,8 +69,7 @@ async def _run_auto_clone(db: AsyncSession) -> list[dict]:
         db.add(clone)
         await db.flush()
 
-        # Log clone (donor IDs recorded before deletion; ON DELETE SET NULL will
-        # clear these FKs in the DB after donors are removed — acceptable for audit)
+        # Log clone (donor IDs are plain integers, not FKs; they survive donor deletion)
         log = CloneLog(
             donor_1_id=victims[0].id,
             donor_2_id=victims[1].id,
@@ -79,8 +78,8 @@ async def _run_auto_clone(db: AsyncSession) -> list[dict]:
         db.add(log)
         await db.flush()
 
-        # Delete the 2 sterile donors; ON DELETE SET NULL propagates to all
-        # referencing FKs (breeding_log, clone_log, muldo_individual self-refs)
+        # Delete the 2 sterile donors; ON DELETE SET NULL propagates to
+        # breeding_log parent FKs and muldo_individual self-ref FKs
         await db.delete(victims[0])
         await db.delete(victims[1])
         await db.flush()
@@ -101,8 +100,8 @@ async def breed(
     child_sex: str,
     cycle_number: int | None = None,
 ) -> dict:
-    parent_f = await _load_muldo_or_400(db, parent_f_id)
-    parent_m = await _load_muldo_or_400(db, parent_m_id)
+    parent_f = await _load_muldo_or_404(db, parent_f_id)
+    parent_m = await _load_muldo_or_404(db, parent_m_id)
 
     # Validate sex
     if parent_f.sex != SexEnum.F:

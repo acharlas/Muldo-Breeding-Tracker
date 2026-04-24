@@ -36,20 +36,12 @@ def upgrade() -> None:
         ['parent_m_id'], ['id'], ondelete='SET NULL',
     )
 
-    # clone_log: drop existing FK constraints, make columns nullable,
-    # recreate with ON DELETE SET NULL
+    # clone_log: drop FK constraints entirely so donor IDs survive donor deletion.
+    # Columns become plain nullable integers — no FK constraint recreated.
     op.drop_constraint('clone_log_donor_1_id_fkey', 'clone_log', type_='foreignkey')
     op.drop_constraint('clone_log_donor_2_id_fkey', 'clone_log', type_='foreignkey')
     op.alter_column('clone_log', 'donor_1_id', existing_type=sa.Integer(), nullable=True)
     op.alter_column('clone_log', 'donor_2_id', existing_type=sa.Integer(), nullable=True)
-    op.create_foreign_key(
-        'clone_log_donor_1_id_fkey', 'clone_log', 'muldo_individual',
-        ['donor_1_id'], ['id'], ondelete='SET NULL',
-    )
-    op.create_foreign_key(
-        'clone_log_donor_2_id_fkey', 'clone_log', 'muldo_individual',
-        ['donor_2_id'], ['id'], ondelete='SET NULL',
-    )
 
     # muldo_individual self-referential FKs: recreate with ON DELETE SET NULL
     op.drop_constraint('fk_muldo_individual_parent_f', 'muldo_individual', type_='foreignkey')
@@ -73,9 +65,7 @@ def downgrade() -> None:
     op.create_foreign_key('fk_muldo_individual_parent_m', 'muldo_individual', 'muldo_individual',
                           ['parent_m_id'], ['id'])
 
-    # Revert clone_log
-    op.drop_constraint('clone_log_donor_2_id_fkey', 'clone_log', type_='foreignkey')
-    op.drop_constraint('clone_log_donor_1_id_fkey', 'clone_log', type_='foreignkey')
+    # Revert clone_log: restore FK constraints on donor columns
     op.alter_column('clone_log', 'donor_2_id', existing_type=sa.Integer(), nullable=False)
     op.alter_column('clone_log', 'donor_1_id', existing_type=sa.Integer(), nullable=False)
     op.create_foreign_key('clone_log_donor_1_id_fkey', 'clone_log', 'muldo_individual',
