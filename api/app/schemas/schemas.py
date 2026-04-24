@@ -90,3 +90,36 @@ class CascadeItem(BaseModel):
     status: Literal["ok", "en_cours", "a_faire"]
     expected_f: int
     expected_m: int
+
+
+class PlanRequest(BaseModel):
+    enclos_count: int
+
+
+class PlannedParent(BaseModel):
+    id: int
+    species_name: str
+    sex: str
+
+
+class PlannedPair(BaseModel):
+    parent_f: PlannedParent
+    parent_m: PlannedParent
+    target_child_species: str
+    success_chance: float
+
+
+class PlannedEnclos(BaseModel):
+    enclos_number: int
+    pairs: list[PlannedPair]
+
+
+class PlanSummary(BaseModel):
+    total_pairs: int
+    estimated_successes: float
+    remaining_after: int
+
+
+class PlanResult(BaseModel):
+    enclos: list[PlannedEnclos]
+    summary: PlanSummary
