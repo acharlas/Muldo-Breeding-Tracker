@@ -38,19 +38,20 @@ async def seed_db(db: AsyncSession) -> dict:
     db.add_all(recipes)
     await db.flush()
 
-    # Mark optimal recipes
+    # Build lookup from already-flushed recipes (avoids N+1 queries)
+    recipe_lookup: dict[tuple[int, int, int], BreedingRecipe] = {
+        (r.child_species_id, r.parent_f_species_id, r.parent_m_species_id): r
+        for r in recipes
+    }
+
     for child_name, (parent_f_name, parent_m_name) in opti.items():
-        child_id = name_to_id[child_name]
-        parent_f_id = name_to_id[parent_f_name]
-        parent_m_id = name_to_id[parent_m_name]
-        result = await db.execute(
-            select(BreedingRecipe).where(
-                BreedingRecipe.child_species_id == child_id,
-                BreedingRecipe.parent_f_species_id == parent_f_id,
-                BreedingRecipe.parent_m_species_id == parent_m_id,
-            )
-        )
-        recipe = result.scalar_one_or_none()
+        try:
+            key = (name_to_id[child_name], name_to_id[parent_f_name], name_to_id[parent_m_name])
+        except KeyError as exc:
+            raise RuntimeError(
+                f"opti_recipe.json references unknown species {exc} for child {child_name!r}"
+            ) from exc
+        recipe = recipe_lookup.get(key)
         if recipe is None:
             raise RuntimeError(
                 f"Optimal recipe not found: {child_name!r} from {parent_f_name!r} × {parent_m_name!r}. "
@@ -60,6 +61,4 @@ async def seed_db(db: AsyncSession) -> dict:
 
     await db.commit()
 
-    species_count = await db.scalar(select(func.count()).select_from(MuldoSpecies))
-    recipe_count = await db.scalar(select(func.count()).select_from(BreedingRecipe))
-    return {"already_seeded": False, "species_count": species_count, "recipes_count": recipe_count}
+    return {"already_seeded": False, "species_count": len(species_objects), "recipes_count": len(recipes)}
