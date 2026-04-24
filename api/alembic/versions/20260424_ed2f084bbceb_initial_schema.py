@@ -87,4 +87,6 @@ def downgrade() -> None:
     op.drop_table('muldo_individual')
     op.drop_table('breeding_recipe')
     op.drop_table('muldo_species')
+    op.execute('DROP TYPE IF EXISTS sexenum')
+    op.execute('DROP TYPE IF EXISTS originenum')
     # ### end Alembic commands ###
