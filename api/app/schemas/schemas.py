@@ -59,3 +59,21 @@ class BulkCaptureRequest(BaseModel):
     species_name: str
     sex: Literal["F", "M"]
     count: int = Field(ge=1, le=500)
+
+
+class BreedRequest(BaseModel):
+    parent_f_id: int
+    parent_m_id: int
+    success: bool
+    child_species_name: str
+    child_sex: Literal["F", "M"]
+
+
+class ClonePerformed(BaseModel):
+    species_name: str
+    sex: str
+
+
+class BreedResult(BaseModel):
+    child: MuldoOut
+    clones_performed: list[ClonePerformed]

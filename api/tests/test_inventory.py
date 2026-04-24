@@ -49,6 +49,7 @@ async def test_bulk_capture_creates_n_individuals():
 @pytest.mark.asyncio
 async def test_inventory_shows_captured():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        await client.post("/api/inventory/capture", json={"species_name": "Doré", "sex": "F"})
         response = await client.get("/api/inventory")
     assert response.status_code == 200
     data = response.json()

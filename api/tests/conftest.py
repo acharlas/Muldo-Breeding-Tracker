@@ -1,13 +1,22 @@
 import pytest
-from app.database import engine
+from sqlalchemy import text
+from app.database import engine, AsyncSessionLocal
 
 
 @pytest.fixture(autouse=True)
-async def dispose_engine():
-    """Dispose the SQLAlchemy engine connection pool after each test.
+async def isolate_db():
+    """Truncate transactional tables before each test and dispose the engine after.
 
-    This prevents asyncpg from raising 'another operation is in progress'
-    errors when the same connection is reused across test functions.
+    muldo_species and breeding_recipe are seed-only tables shared across tests;
+    they are NOT truncated. muldo_individual, breeding_log, and clone_log contain
+    per-test state and are cleared to prevent cross-test contamination.
     """
+    async with AsyncSessionLocal() as session:
+        await session.execute(text(
+            "TRUNCATE TABLE clone_log, breeding_log, muldo_individual RESTART IDENTITY CASCADE"
+        ))
+        await session.commit()
+
     yield
+
     await engine.dispose()

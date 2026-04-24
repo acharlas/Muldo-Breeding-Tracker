@@ -81,16 +81,16 @@ class BreedingLog(Base):
     __tablename__ = "breeding_log"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    parent_f_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
-    parent_m_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
+    parent_f_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id"), nullable=True)
+    parent_m_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id"), nullable=True)
     child_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
     target_species_id: Mapped[int] = mapped_column(ForeignKey("muldo_species.id"), nullable=False)
     success: Mapped[bool] = mapped_column(Boolean, nullable=False)
     cycle_number: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    parent_f: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[parent_f_id])
-    parent_m: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[parent_m_id])
+    parent_f: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_f_id])
+    parent_m: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_m_id])
     child: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[child_id])
     target_species: Mapped["MuldoSpecies"] = relationship("MuldoSpecies", foreign_keys=[target_species_id])
 
@@ -99,11 +99,11 @@ class CloneLog(Base):
     __tablename__ = "clone_log"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    donor_1_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
-    donor_2_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
+    donor_1_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id"), nullable=True)
+    donor_2_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id"), nullable=True)
     result_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    donor_1: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[donor_1_id])
-    donor_2: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[donor_2_id])
+    donor_1: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[donor_1_id])
+    donor_2: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[donor_2_id])
     result: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[result_id])
