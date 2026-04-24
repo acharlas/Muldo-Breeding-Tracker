@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 from datetime import datetime
 
@@ -58,4 +58,4 @@ class CaptureRequest(BaseModel):
 class BulkCaptureRequest(BaseModel):
     species_name: str
     sex: Literal["F", "M"]
-    count: int
+    count: int = Field(ge=1, le=500)
