@@ -89,13 +89,32 @@ def test_cascade_owned_reduces_remaining_not_target():
 
 
 def test_cascade_status_en_cours_when_partial():
-    """Status is 'a_faire' when remaining > 0 but none owned."""
+    """Status is 'en_cours' when remaining > 0 and some owned; 'a_faire' when none owned."""
+    # a_faire: no owned
     species = [_make_species(10, "Gen10A", 10)]
     result = compute_cascade(species, [], {})
-    assert result[0]["status"] == "a_faire"  # 0 owned
+    assert result[0]["status"] == "a_faire"
 
-    result2 = compute_cascade([_make_species(10, "Gen10B", 10)], [], {10: 0})
-    assert result2[0]["status"] == "a_faire"
+    # en_cours: 1 owned but production_target=2, so remaining=1 > 0
+    # Set up a Gen9 parent with production_target=2 (needs 2 children each requiring ceil(2/2)=1)
+    species2 = [
+        _make_species(10, "Gen10A", 10),
+        _make_species(11, "Gen10B", 10),
+        _make_species(9, "SharedParent", 9),
+        _make_species(8, "OtherF", 9),
+        _make_species(7, "OtherG", 9),
+    ]
+    recipes2 = [
+        _make_recipe(child_id=10, pf_id=9, pm_id=8),
+        _make_recipe(child_id=11, pf_id=9, pm_id=7),
+    ]
+    # SharedParent needs production_target=2, own 1 → remaining=1 → en_cours
+    result2 = compute_cascade(species2, recipes2, {9: 1})
+    by_name = {r["species_name"]: r for r in result2}
+    assert by_name["SharedParent"]["production_target"] == 2
+    assert by_name["SharedParent"]["total_owned"] == 1
+    assert by_name["SharedParent"]["remaining"] == 1
+    assert by_name["SharedParent"]["status"] == "en_cours"
 
 
 def test_cascade_expected_f_is_66_percent():
