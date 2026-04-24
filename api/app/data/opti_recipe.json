@@ -1,0 +1,462 @@
+{
+  "Doré et Pourpre": [
+    "Doré",
+    "Pourpre"
+  ],
+  "Indigo et Pourpre": [
+    "Indigo",
+    "Pourpre"
+  ],
+  "Ebène et Pourpre": [
+    "Ebène",
+    "Pourpre"
+  ],
+  "Orchidée et Pourpre": [
+    "Orchidée",
+    "Pourpre"
+  ],
+  "Doré et Orchidée": [
+    "Doré",
+    "Orchidée"
+  ],
+  "Indigo et Orchidée": [
+    "Indigo",
+    "Orchidée"
+  ],
+  "Ebène et Orchidée": [
+    "Ebène",
+    "Orchidée"
+  ],
+  "Doré et Ebène": [
+    "Doré",
+    "Ebène"
+  ],
+  "Doré et Indigo": [
+    "Doré",
+    "Indigo"
+  ],
+  "Ebène et Indigo": [
+    "Ebène",
+    "Indigo"
+  ],
+  "Roux": [
+    "Doré et Pourpre",
+    "Doré et Indigo"
+  ],
+  "Amande": [
+    "Indigo et Pourpre",
+    "Ebène et Orchidée"
+  ],
+  "Doré et Amande": [
+    "Doré",
+    "Amande"
+  ],
+  "Ebène et Amande": [
+    "Ebène",
+    "Amande"
+  ],
+  "Indigo et Amande": [
+    "Indigo",
+    "Amande"
+  ],
+  "Orchidée et Amande": [
+    "Orchidée",
+    "Amande"
+  ],
+  "Pourpre et Amande": [
+    "Pourpre",
+    "Amande"
+  ],
+  "Roux et Amande": [
+    "Roux",
+    "Amande"
+  ],
+  "Roux et Doré": [
+    "Roux",
+    "Doré"
+  ],
+  "Roux et Ebène": [
+    "Roux",
+    "Ebène"
+  ],
+  "Roux et Indigo": [
+    "Roux",
+    "Indigo"
+  ],
+  "Roux et Orchidée": [
+    "Roux",
+    "Orchidée"
+  ],
+  "Roux et Pourpre": [
+    "Roux",
+    "Pourpre"
+  ],
+  "Ivoire": [
+    "Roux et Doré",
+    "Ebène et Amande"
+  ],
+  "Turquoise": [
+    "Doré et Amande",
+    "Roux et Ebène"
+  ],
+  "Pourpre et Ivoire": [
+    "Pourpre",
+    "Ivoire"
+  ],
+  "Orchidée et Ivoire": [
+    "Orchidée",
+    "Ivoire"
+  ],
+  "Indigo et Ivoire": [
+    "Indigo",
+    "Ivoire"
+  ],
+  "Ebène et Ivoire": [
+    "Ebène",
+    "Ivoire"
+  ],
+  "Doré et Ivoire": [
+    "Doré",
+    "Ivoire"
+  ],
+  "Roux et Ivoire": [
+    "Roux",
+    "Ivoire"
+  ],
+  "Amande et Ivoire": [
+    "Amande",
+    "Ivoire"
+  ],
+  "Turquoise et Ivoire": [
+    "Turquoise",
+    "Ivoire"
+  ],
+  "Turquoise et Pourpre": [
+    "Turquoise",
+    "Pourpre"
+  ],
+  "Turquoise et Orchidée": [
+    "Turquoise",
+    "Orchidée"
+  ],
+  "Turquoise et Indigo": [
+    "Turquoise",
+    "Indigo"
+  ],
+  "Turquoise et Ebène": [
+    "Turquoise",
+    "Ebène"
+  ],
+  "Turquoise et Roux": [
+    "Turquoise",
+    "Roux"
+  ],
+  "Turquoise et Amande": [
+    "Turquoise",
+    "Amande"
+  ],
+  "Turquoise et Doré": [
+    "Turquoise",
+    "Doré"
+  ],
+  "Prune": [
+    "Ebène et Ivoire",
+    "Turquoise et Pourpre"
+  ],
+  "Emeraude": [
+    "Turquoise et Ivoire",
+    "Turquoise et Doré"
+  ],
+  "Prune et Pourpre": [
+    "Prune",
+    "Pourpre"
+  ],
+  "Prune et Orchidée": [
+    "Prune",
+    "Orchidée"
+  ],
+  "Prune et Indigo": [
+    "Prune",
+    "Indigo"
+  ],
+  "Prune et Ebène": [
+    "Prune",
+    "Ebène"
+  ],
+  "Prune et Doré": [
+    "Prune",
+    "Doré"
+  ],
+  "Prune et Roux": [
+    "Prune",
+    "Roux"
+  ],
+  "Prune et Amande": [
+    "Prune",
+    "Amande"
+  ],
+  "Prune et Ivoire": [
+    "Prune",
+    "Ivoire"
+  ],
+  "Prune et Turquoise": [
+    "Prune",
+    "Turquoise"
+  ],
+  "Prune et Emeraude": [
+    "Prune",
+    "Emeraude"
+  ],
+  "Pourpre et Emeraude": [
+    "Pourpre",
+    "Emeraude"
+  ],
+  "Orchidée et Emeraude": [
+    "Orchidée",
+    "Emeraude"
+  ],
+  "Indigo et Emeraude": [
+    "Indigo",
+    "Emeraude"
+  ],
+  "Ebène et Emeraude": [
+    "Ebène",
+    "Emeraude"
+  ],
+  "Doré et Emeraude": [
+    "Doré",
+    "Emeraude"
+  ],
+  "Roux et Emeraude": [
+    "Roux",
+    "Emeraude"
+  ],
+  "Amande et Emeraude": [
+    "Amande",
+    "Emeraude"
+  ],
+  "Ivoire et Emeraude": [
+    "Ivoire",
+    "Emeraude"
+  ],
+  "Turquoise et Emeraude": [
+    "Turquoise",
+    "Emeraude"
+  ],
+  "Ambre": [
+    "Indigo et Emeraude",
+    "Ivoire et Emeraude"
+  ],
+  "Corail": [
+    "Prune et Doré",
+    "Prune et Emeraude"
+  ],
+  "Azur": [
+    "Pourpre et Emeraude",
+    "Prune et Roux"
+  ],
+  "Aigue-marine": [
+    "Prune et Pourpre",
+    "Roux et Emeraude"
+  ],
+  "Ambre et Doré": [
+    "Ambre",
+    "Doré"
+  ],
+  "Ambre et Ebène": [
+    "Ambre",
+    "Ebène"
+  ],
+  "Ambre et Indigo": [
+    "Ambre",
+    "Indigo"
+  ],
+  "Ambre et Pourpre": [
+    "Ambre",
+    "Pourpre"
+  ],
+  "Ambre et Orchidée": [
+    "Ambre",
+    "Orchidée"
+  ],
+  "Ambre et Amande": [
+    "Ambre",
+    "Amande"
+  ],
+  "Ambre et Roux": [
+    "Ambre",
+    "Roux"
+  ],
+  "Ambre et Ivoire": [
+    "Ambre",
+    "Ivoire"
+  ],
+  "Ambre et Turquoise": [
+    "Ambre",
+    "Turquoise"
+  ],
+  "Ambre et Emeraude": [
+    "Ambre",
+    "Emeraude"
+  ],
+  "Ambre et Prune": [
+    "Ambre",
+    "Prune"
+  ],
+  "Ambre et Corail": [
+    "Ambre",
+    "Corail"
+  ],
+  "Ambre et Azur": [
+    "Ambre",
+    "Azur"
+  ],
+  "Ambre et Aigue-marine": [
+    "Ambre",
+    "Aigue-marine"
+  ],
+  "Corail et Doré": [
+    "Corail",
+    "Doré"
+  ],
+  "Corail et Ebène": [
+    "Corail",
+    "Ebène"
+  ],
+  "Corail et Indigo": [
+    "Corail",
+    "Indigo"
+  ],
+  "Corail et Pourpre": [
+    "Corail",
+    "Pourpre"
+  ],
+  "Corail et Orchidée": [
+    "Corail",
+    "Orchidée"
+  ],
+  "Corail et Amande": [
+    "Corail",
+    "Amande"
+  ],
+  "Corail et Roux": [
+    "Corail",
+    "Roux"
+  ],
+  "Corail et Ivoire": [
+    "Corail",
+    "Ivoire"
+  ],
+  "Corail et Turquoise": [
+    "Corail",
+    "Turquoise"
+  ],
+  "Corail et Emeraude": [
+    "Corail",
+    "Emeraude"
+  ],
+  "Corail et Prune": [
+    "Corail",
+    "Prune"
+  ],
+  "Corail et Azur": [
+    "Corail",
+    "Azur"
+  ],
+  "Corail et Aigue-marine": [
+    "Corail",
+    "Aigue-marine"
+  ],
+  "Azur et Doré": [
+    "Azur",
+    "Doré"
+  ],
+  "Azur et Ebène": [
+    "Azur",
+    "Ebène"
+  ],
+  "Azur et Indigo": [
+    "Azur",
+    "Indigo"
+  ],
+  "Azur et Pourpre": [
+    "Azur",
+    "Pourpre"
+  ],
+  "Azur et Orchidée": [
+    "Azur",
+    "Orchidée"
+  ],
+  "Azur et Amande": [
+    "Azur",
+    "Amande"
+  ],
+  "Azur et Roux": [
+    "Azur",
+    "Roux"
+  ],
+  "Azur et Ivoire": [
+    "Azur",
+    "Ivoire"
+  ],
+  "Azur et Turquoise": [
+    "Azur",
+    "Turquoise"
+  ],
+  "Azur et Emeraude": [
+    "Azur",
+    "Emeraude"
+  ],
+  "Azur et Prune": [
+    "Azur",
+    "Prune"
+  ],
+  "Azur et Aigue-marine": [
+    "Azur",
+    "Aigue-marine"
+  ],
+  "Aigue-marine et Doré": [
+    "Aigue-marine",
+    "Doré"
+  ],
+  "Aigue-marine et Ebène": [
+    "Aigue-marine",
+    "Ebène"
+  ],
+  "Aigue-marine et Indigo": [
+    "Aigue-marine",
+    "Indigo"
+  ],
+  "Aigue-marine et Pourpre": [
+    "Aigue-marine",
+    "Pourpre"
+  ],
+  "Aigue-marine et Orchidée": [
+    "Aigue-marine",
+    "Orchidée"
+  ],
+  "Aigue-marine et Amande": [
+    "Aigue-marine",
+    "Amande"
+  ],
+  "Aigue-marine et Roux": [
+    "Aigue-marine",
+    "Roux"
+  ],
+  "Aigue-marine et Ivoire": [
+    "Aigue-marine",
+    "Ivoire"
+  ],
+  "Aigue-marine et Turquoise": [
+    "Aigue-marine",
+    "Turquoise"
+  ],
+  "Aigue-marine et Emeraude": [
+    "Aigue-marine",
+    "Emeraude"
+  ],
+  "Aigue-marine et Prune": [
+    "Aigue-marine",
+    "Prune"
+  ]
+}
