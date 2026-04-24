@@ -77,3 +77,16 @@ class ClonePerformed(BaseModel):
 class BreedResult(BaseModel):
     child: MuldoOut
     clones_performed: list[ClonePerformed]
+
+
+class CascadeItem(BaseModel):
+    species_name: str
+    generation: int
+    production_target: int
+    fertile_f: int
+    fertile_m: int
+    total_owned: int
+    remaining: int
+    status: str
+    expected_f: int
+    expected_m: int

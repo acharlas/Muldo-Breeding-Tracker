@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers.seed import router as seed_router
 from app.routers.inventory import router as inventory_router
 from app.routers.breeding import router as breeding_router
+from app.routers.cascade import router as cascade_router
 
 app = FastAPI(title="Muldo Tracker API")
 
@@ -17,6 +18,7 @@ app.add_middleware(
 app.include_router(seed_router)
 app.include_router(inventory_router)
 app.include_router(breeding_router)
+app.include_router(cascade_router)
 
 
 @app.get("/")
