@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { CascadeView } from '@/components/cascade/CascadeView'
+import { InventaireView } from '@/components/inventaire/InventaireView'
 
 type View = 'cascade' | 'inventaire' | 'enclos'
 
@@ -17,7 +18,7 @@ export default function DashboardShell() {
         position: 'relative', zIndex: 1, minHeight: '100vh' }}>
         <div style={{ padding: '32px 36px', maxWidth: 1320 }}>
           {activeView === 'cascade'    && <CascadeView />}
-          {activeView === 'inventaire' && <div style={{ color: '#6B7280' }}>Inventaire view — coming soon</div>}
+          {activeView === 'inventaire' && <InventaireView />}
           {activeView === 'enclos'     && <div style={{ color: '#6B7280' }}>Enclos view — coming soon</div>}
         </div>
       </main>
