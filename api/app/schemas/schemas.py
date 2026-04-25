@@ -126,7 +126,7 @@ class PlanResult(BaseModel):
 
 
 class BatchBreedRequest(BaseModel):
-    results: list[BreedRequest]
+    results: list[BreedRequest] = Field(default=[], max_length=500)
 
 
 class BatchBreedResult(BaseModel):
@@ -135,4 +135,5 @@ class BatchBreedResult(BaseModel):
     successes: int
     fails: int
     clones_auto: int
+    errors: list[dict]  # list of {"index": i, "detail": "..."} for failed breeds
     updated_cascade: list[CascadeItem]

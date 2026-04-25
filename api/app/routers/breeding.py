@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
@@ -13,32 +13,39 @@ from app.services.cascade import get_cascade
 router = APIRouter(prefix="/api")
 
 
+# /breed/batch must be registered before /breed (FastAPI first-match routing)
 @router.post("/breed/batch", response_model=BatchBreedResult)
 async def breed_batch(body: BatchBreedRequest, db: AsyncSession = Depends(get_db)):
-    # Get next cycle number (current max + 1)
-    current_max = await db.scalar(select(func.max(BreedingLog.cycle_number)))
-    cycle_number = (current_max or 0) + 1
+    if body.results:
+        current_max = await db.scalar(select(func.max(BreedingLog.cycle_number)))
+        cycle_number = (current_max or 0) + 1
+    else:
+        cycle_number = 0
 
     total_breeds = len(body.results)
     successes = 0
     fails = 0
     clones_auto = 0
+    errors: list[dict] = []
 
-    for breed_req in body.results:
-        result = await breed_svc.breed(
-            db,
-            parent_f_id=breed_req.parent_f_id,
-            parent_m_id=breed_req.parent_m_id,
-            success=breed_req.success,
-            child_species_name=breed_req.child_species_name,
-            child_sex=breed_req.child_sex,
-            cycle_number=cycle_number,
-        )
-        if breed_req.success:
-            successes += 1
-        else:
-            fails += 1
-        clones_auto += len(result["clones_performed"])
+    for i, breed_req in enumerate(body.results):
+        try:
+            result = await breed_svc.breed(
+                db,
+                parent_f_id=breed_req.parent_f_id,
+                parent_m_id=breed_req.parent_m_id,
+                success=breed_req.success,
+                child_species_name=breed_req.child_species_name,
+                child_sex=breed_req.child_sex,
+                cycle_number=cycle_number,
+            )
+            if breed_req.success:
+                successes += 1
+            else:
+                fails += 1
+            clones_auto += len(result["clones_performed"])
+        except HTTPException as exc:
+            errors.append({"index": i, "detail": exc.detail})
 
     cascade = await get_cascade(db)
 
@@ -48,6 +55,7 @@ async def breed_batch(body: BatchBreedRequest, db: AsyncSession = Depends(get_db
         successes=successes,
         fails=fails,
         clones_auto=clones_auto,
+        errors=errors,
         updated_cascade=[CascadeItem(**item) for item in cascade],
     )
 
