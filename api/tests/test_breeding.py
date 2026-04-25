@@ -112,3 +112,16 @@ async def test_auto_clone_triggers_on_same_species_sex():
     assert len(clones) >= 1
     clone = next(c for c in clones if c["species_name"] == "Doré" and c["sex"] == "F")
     assert clone is not None
+
+
+@pytest.mark.asyncio
+async def test_breed_nonexistent_parent_returns_404():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.post("/api/breed", json={
+            "parent_f_id": 999999,
+            "parent_m_id": 999998,
+            "success": True,
+            "child_species_name": "Doré et Pourpre",
+            "child_sex": "F",
+        })
+    assert response.status_code == 404
