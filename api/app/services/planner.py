@@ -2,6 +2,7 @@ from collections import defaultdict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.models import MuldoSpecies, BreedingRecipe, MuldoIndividual, SexEnum
+from app.services.cascade import get_cascade
 
 SUCCESS_CHANCE = 0.55  # (50+50)*0.15 + 30 + 10 = 55%, level 50 + optimal bonus
 
@@ -38,7 +39,6 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
             available_m[m.species_id].append(m)
 
     # Load cascade to get remaining counts (for priority ordering)
-    from app.services.cascade import get_cascade
     cascade_items = await get_cascade(db)
     remaining_by_name = {item["species_name"]: item["remaining"] for item in cascade_items}
 
@@ -72,25 +72,25 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
     for cand in candidates:
         if len(pairs) >= capacity:
             break
-        recipe = cand["recipe"]
         child_species = cand["child_species"]
 
-        pf = next((m for m in cand["pf"] if m.id not in used_ids), None)
-        pm = next((m for m in cand["pm"] if m.id not in used_ids), None)
-        if pf is None or pm is None:
-            continue
+        while len(pairs) < capacity:
+            pf = next((m for m in cand["pf"] if m.id not in used_ids), None)
+            pm = next((m for m in cand["pm"] if m.id not in used_ids), None)
+            if pf is None or pm is None:
+                break  # no more available pairs for this recipe
 
-        used_ids.add(pf.id)
-        used_ids.add(pm.id)
-        pf_species = all_species[pf.species_id]
-        pm_species = all_species[pm.species_id]
+            used_ids.add(pf.id)
+            used_ids.add(pm.id)
+            pf_species = all_species[pf.species_id]
+            pm_species = all_species[pm.species_id]
 
-        pairs.append({
-            "parent_f": {"id": pf.id, "species_name": pf_species.name, "sex": "F"},
-            "parent_m": {"id": pm.id, "species_name": pm_species.name, "sex": "M"},
-            "target_child_species": child_species.name,
-            "success_chance": SUCCESS_CHANCE,
-        })
+            pairs.append({
+                "parent_f": {"id": pf.id, "species_name": pf_species.name, "sex": "F"},
+                "parent_m": {"id": pm.id, "species_name": pm_species.name, "sex": "M"},
+                "target_child_species": child_species.name,
+                "success_chance": SUCCESS_CHANCE,
+            })
 
     # Pack pairs into enclos (5 per enclos)
     enclos = []
@@ -103,6 +103,7 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
     total_pairs = len(pairs)
     estimated_successes = round(total_pairs * SUCCESS_CHANCE, 2)
     total_remaining = sum(remaining_by_name.values())
+    # rough heuristic: cross-species aggregate, not per-species
     remaining_after = max(0, total_remaining - round(estimated_successes))
 
     return {

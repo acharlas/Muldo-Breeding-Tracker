@@ -93,7 +93,7 @@ class CascadeItem(BaseModel):
 
 
 class PlanRequest(BaseModel):
-    enclos_count: int
+    enclos_count: int = Field(ge=1)
 
 
 class PlannedParent(BaseModel):

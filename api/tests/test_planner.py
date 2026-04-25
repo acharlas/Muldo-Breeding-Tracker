@@ -45,11 +45,11 @@ async def test_plan_only_uses_available_individuals():
         response = await client.post("/api/plan", json={"enclos_count": 1})
     assert response.status_code == 200
     data = response.json()
-    if data["summary"]["total_pairs"] > 0:
-        pair = data["enclos"][0]["pairs"][0]
-        assert "id" in pair["parent_f"]
-        assert "id" in pair["parent_m"]
-        assert pair["success_chance"] == pytest.approx(0.55)
+    assert data["summary"]["total_pairs"] >= 1
+    pair = data["enclos"][0]["pairs"][0]
+    assert "id" in pair["parent_f"]
+    assert "id" in pair["parent_m"]
+    assert pair["success_chance"] == pytest.approx(0.55)
 
 
 @pytest.mark.asyncio
