@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { CascadeView } from '@/components/cascade/CascadeView'
 import { InventaireView } from '@/components/inventaire/InventaireView'
+import { EnclosView } from '@/components/enclos/EnclosView'
 
 type View = 'cascade' | 'inventaire' | 'enclos'
 
@@ -19,7 +20,7 @@ export default function DashboardShell() {
         <div style={{ padding: '32px 36px', maxWidth: 1320 }}>
           {activeView === 'cascade'    && <CascadeView />}
           {activeView === 'inventaire' && <InventaireView />}
-          {activeView === 'enclos'     && <div style={{ color: '#6B7280' }}>Enclos view — coming soon</div>}
+          {activeView === 'enclos'     && <EnclosView />}
         </div>
       </main>
     </div>
