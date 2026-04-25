@@ -76,9 +76,12 @@ export type BatchBreedError = {
 
 export type BatchBreedResult = {
   cycle_number: number
-  total: number
+  total_breeds: number
   successes: number
+  fails: number
+  clones_auto: number
   errors: BatchBreedError[]
+  updated_cascade: CascadeItem[]
 }
 
 export type PairResult = {

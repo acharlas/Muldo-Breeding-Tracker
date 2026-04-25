@@ -2,6 +2,7 @@ import type {
   CascadeItem,
   InventoryEntry,
   InventoryStats,
+  MuldoOut,
   PlanResult,
   BatchBreedResult,
   BreedRequest,
@@ -38,8 +39,10 @@ export const apiCalls = {
   getCascade: () => api.get<CascadeItem[]>('/api/cascade'),
   getInventory: () => api.get<Record<string, InventoryEntry>>('/api/inventory'),
   getInventoryStats: () => api.get<InventoryStats>('/api/inventory/stats'),
-  capture: (species_name: string, sex: 'F' | 'M', count = 1) =>
-    api.post<unknown>('/api/inventory/capture', { species_name, sex, count }),
+  capture: (species_name: string, sex: 'F' | 'M') =>
+    api.post<MuldoOut>('/api/inventory/capture', { species_name, sex }),
+  bulkCapture: (species_name: string, sex: 'F' | 'M', count: number) =>
+    api.post<MuldoOut[]>('/api/inventory/bulk-capture', { species_name, sex, count }),
   getPlan: (enclos_count: number) =>
     api.post<PlanResult>('/api/plan', { enclos_count }),
   submitBatch: (results: BreedRequest[]) =>
