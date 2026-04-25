@@ -81,3 +81,24 @@ async def test_batch_returns_updated_cascade():
     data = response.json()
     assert "updated_cascade" in data
     assert isinstance(data["updated_cascade"], list)
+
+
+@pytest.mark.asyncio
+async def test_batch_partial_failure_accumulates_errors():
+    """A bad breed in a batch should not stop other breeds; errors are returned in the response."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        f1 = await _capture(client, "Doré", "F")
+        m1 = await _capture(client, "Pourpre", "M")
+        response = await client.post("/api/breed/batch", json={"results": [
+            # index 0: valid breed
+            {"parent_f_id": f1["id"], "parent_m_id": m1["id"],
+             "success": True, "child_species_name": "Doré et Pourpre", "child_sex": "M"},
+            # index 1: nonexistent IDs — should fail and be captured in errors
+            {"parent_f_id": 999999, "parent_m_id": 999998,
+             "success": True, "child_species_name": "Doré et Pourpre", "child_sex": "M"},
+        ]})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["successes"] == 1
+    assert len(data["errors"]) == 1
+    assert data["errors"][0]["index"] == 1

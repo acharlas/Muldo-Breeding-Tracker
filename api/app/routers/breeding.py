@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.models import BreedingLog
 from app.schemas.schemas import (
     BreedRequest, BreedResult, MuldoOut, ClonePerformed,
-    BatchBreedRequest, BatchBreedResult, CascadeItem,
+    BatchBreedRequest, BatchBreedResult, BatchBreedError, CascadeItem,
 )
 from app.services import breeding as breed_svc
 from app.services.cascade import get_cascade
@@ -26,7 +26,7 @@ async def breed_batch(body: BatchBreedRequest, db: AsyncSession = Depends(get_db
     successes = 0
     fails = 0
     clones_auto = 0
-    errors: list[dict] = []
+    errors: list[BatchBreedError] = []
 
     for i, breed_req in enumerate(body.results):
         try:
@@ -45,7 +45,7 @@ async def breed_batch(body: BatchBreedRequest, db: AsyncSession = Depends(get_db
                 fails += 1
             clones_auto += len(result["clones_performed"])
         except HTTPException as exc:
-            errors.append({"index": i, "detail": exc.detail})
+            errors.append(BatchBreedError(index=i, detail=exc.detail))
 
     cascade = await get_cascade(db)
 

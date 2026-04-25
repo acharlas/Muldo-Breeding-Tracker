@@ -129,11 +129,16 @@ class BatchBreedRequest(BaseModel):
     results: list[BreedRequest] = Field(default=[], max_length=500)
 
 
+class BatchBreedError(BaseModel):
+    index: int
+    detail: str
+
+
 class BatchBreedResult(BaseModel):
     cycle_number: int
     total_breeds: int
     successes: int
     fails: int
     clones_auto: int
-    errors: list[dict]  # list of {"index": i, "detail": "..."} for failed breeds
+    errors: list[BatchBreedError]
     updated_cascade: list[CascadeItem]
