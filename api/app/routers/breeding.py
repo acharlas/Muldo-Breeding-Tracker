@@ -45,6 +45,7 @@ async def breed_batch(body: BatchBreedRequest, db: AsyncSession = Depends(get_db
                 fails += 1
             clones_auto += len(result["clones_performed"])
         except HTTPException as exc:
+            await db.rollback()
             errors.append(BatchBreedError(index=i, detail=exc.detail))
 
     cascade = await get_cascade(db)

@@ -102,3 +102,24 @@ async def test_batch_partial_failure_accumulates_errors():
     assert data["successes"] == 1
     assert len(data["errors"]) == 1
     assert data["errors"][0]["index"] == 1
+
+
+@pytest.mark.asyncio
+async def test_batch_failure_does_not_corrupt_parent_fertility():
+    """A failed breed should not mark parents as infertile in subsequent reads."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        f1 = await _capture(client, "Doré", "F")
+        m1 = await _capture(client, "Pourpre", "M")
+        # index 0: invalid recipe (Doré × Pourpre cannot produce "Orchidée") — should fail
+        # index 1: valid breed with the same parents — should succeed if parents not marked infertile
+        response = await client.post("/api/breed/batch", json={"results": [
+            {"parent_f_id": f1["id"], "parent_m_id": m1["id"],
+             "success": True, "child_species_name": "Orchidée", "child_sex": "F"},
+            {"parent_f_id": f1["id"], "parent_m_id": m1["id"],
+             "success": True, "child_species_name": "Doré et Pourpre", "child_sex": "M"},
+        ]})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["errors"]) == 1  # index 0 failed
+    assert data["errors"][0]["index"] == 0
+    assert data["successes"] == 1    # index 1 succeeded
