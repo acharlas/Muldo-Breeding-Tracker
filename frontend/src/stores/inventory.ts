@@ -16,11 +16,16 @@ export const useInventoryStore = create<InventoryStore>()((set) => ({
   loading: false,
   fetch: async () => {
     set({ loading: true })
-    const [inventory, stats] = await Promise.all([
-      apiCalls.getInventory(),
-      apiCalls.getInventoryStats(),
-    ])
-    set({ inventory, stats, loading: false })
+    try {
+      const [inventory, stats] = await Promise.all([
+        apiCalls.getInventory(),
+        apiCalls.getInventoryStats(),
+      ])
+      set({ inventory, stats, loading: false })
+    } catch (e) {
+      set({ loading: false })
+      throw e
+    }
   },
   capture: async (speciesName, sex, count = 1) => {
     if (count === 1) {

@@ -22,8 +22,13 @@ export const usePlannerStore = create<PlannerStore>()(
 
       generate: async (enclosCount) => {
         set({ loading: true })
-        const plan = await apiCalls.getPlan(enclosCount)
-        set({ plan, results: {}, loading: false })
+        try {
+          const plan = await apiCalls.getPlan(enclosCount)
+          set({ plan, results: {}, loading: false })
+        } catch (e) {
+          set({ loading: false })
+          throw e
+        }
       },
 
       setResult: (key, result) =>
