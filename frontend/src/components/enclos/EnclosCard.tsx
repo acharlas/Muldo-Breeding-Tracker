@@ -17,7 +17,7 @@ export function EnclosCard({ enclos }: { enclos: PlannedEnclos }) {
       </div>
       <CardContent style={{ padding: '10px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {enclos.pairs.map((pair, i) => (
-          <PairCard key={i} pair={pair} index={i} />
+          <PairCard key={`${pair.parent_f.id}-${pair.parent_m.id}`} pair={pair} index={i} />
         ))}
       </CardContent>
     </Card>

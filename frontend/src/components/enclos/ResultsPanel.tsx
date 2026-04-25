@@ -11,6 +11,7 @@ export function ResultsPanel() {
   const { plan, results, setResult, submitBatch } = usePlannerStore()
   const allSpecies = useCascadeStore((s) => s.items.map((i) => i.species_name))
   const [errors, setErrors] = useState<BatchBreedError[]>([])
+  const [networkError, setNetworkError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   if (!plan) return null
@@ -24,11 +25,13 @@ export function ResultsPanel() {
 
   const handleSubmit = async () => {
     setSubmitting(true)
+    setErrors([])
+    setNetworkError(null)
     try {
       const result = await submitBatch()
       if (result.errors.length > 0) setErrors(result.errors)
     } catch (e) {
-      console.error('submitBatch failed', e)
+      setNetworkError(String(e))
     } finally {
       setSubmitting(false)
     }
@@ -96,6 +99,13 @@ export function ResultsPanel() {
           )
         })}
       </div>
+
+      {networkError && (
+        <div style={{ margin: '0 16px 12px', padding: 12, background: 'rgba(239,68,68,0.1)',
+          border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8 }}>
+          <div style={{ fontSize: 12, color: '#F87171' }}>{networkError}</div>
+        </div>
+      )}
 
       {errors.length > 0 && (
         <div style={{ margin: '0 16px 12px', padding: 12, background: 'rgba(239,68,68,0.1)',

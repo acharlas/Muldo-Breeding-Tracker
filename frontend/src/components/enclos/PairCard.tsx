@@ -2,7 +2,6 @@
 
 import { Target } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { GenBadge } from '@/components/shared/GenBadge'
 import type { PlannedPair } from '@/types'
 
 export function PairCard({ pair, index }: { pair: PlannedPair; index: number }) {
@@ -19,14 +18,12 @@ export function PairCard({ pair, index }: { pair: PlannedPair; index: number }) 
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {pair.parent_f.species_name}
       </span>
-      <GenBadge gen={1} />
       <span style={{ color: '#374151', fontWeight: 700, padding: '0 4px' }}>×</span>
       <span style={{ fontSize: 10, color: '#9CA3AF' }}>♂</span>
       <span style={{ fontSize: 11, color: '#E5E7EB', fontWeight: 500, maxWidth: 80,
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {pair.parent_m.species_name}
       </span>
-      <GenBadge gen={1} />
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
         <Target size={12} style={{ color: '#E5E7EB' }} />
         <span style={{ fontSize: 11, color: '#E5E7EB', fontWeight: 600,
