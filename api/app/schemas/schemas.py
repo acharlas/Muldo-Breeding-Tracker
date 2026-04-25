@@ -123,3 +123,16 @@ class PlanSummary(BaseModel):
 class PlanResult(BaseModel):
     enclos: list[PlannedEnclos]
     summary: PlanSummary
+
+
+class BatchBreedRequest(BaseModel):
+    results: list[BreedRequest]
+
+
+class BatchBreedResult(BaseModel):
+    cycle_number: int
+    total_breeds: int
+    successes: int
+    fails: int
+    clones_auto: int
+    updated_cascade: list[CascadeItem]
