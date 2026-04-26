@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { usePlannerStore } from '@/stores/planner'
 import { useCascadeStore } from '@/stores/cascade'
 import { PlannerForm } from './PlannerForm'
-import type { BatchBreedError, PairResult, PlannedPair } from '@/types'
+import type { BatchBreedError, BatchBreedResult, PairResult, PlannedPair } from '@/types'
 
 const PINK = '#F472B6'
 const BLUE  = '#60A5FA'
@@ -43,21 +43,21 @@ function PairRow({
 
       {/* Pair info row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 12, color: '#4B5563', fontWeight: 700, width: 22 }}>
+        <span style={{ fontSize: 13, color: '#4B5563', fontWeight: 700, width: 22 }}>
           {index + 1}
         </span>
-        <span style={{ fontSize: 13, color: PINK, fontWeight: 600 }}>♀</span>
-        <span style={{ fontSize: 14, color: '#E5E7EB', fontWeight: 500 }}>
+        <span style={{ fontSize: 15, color: PINK, fontWeight: 600 }}>♀</span>
+        <span style={{ fontSize: 15, color: '#E5E7EB', fontWeight: 500 }}>
           {pair.parent_f.species_name}
         </span>
         <span style={{ color: '#374151', fontWeight: 700 }}>×</span>
-        <span style={{ fontSize: 13, color: BLUE, fontWeight: 600 }}>♂</span>
-        <span style={{ fontSize: 14, color: '#E5E7EB', fontWeight: 500 }}>
+        <span style={{ fontSize: 15, color: BLUE, fontWeight: 600 }}>♂</span>
+        <span style={{ fontSize: 15, color: '#E5E7EB', fontWeight: 500 }}>
           {pair.parent_m.species_name}
         </span>
         <div style={{ flex: 1 }} />
-        <Target size={13} style={{ color: '#9CA3AF' }} />
-        <span style={{ fontSize: 13, color: '#D1D5DB' }}>{pair.target_child_species}</span>
+        <Target size={14} style={{ color: '#9CA3AF' }} />
+        <span style={{ fontSize: 15, color: '#D1D5DB' }}>{pair.target_child_species}</span>
       </div>
 
       {/* Result inputs */}
@@ -67,7 +67,7 @@ function PairRow({
           <Button size="sm"
             variant={r?.success === true ? 'default' : 'outline'}
             onClick={() => setSuccess(true)}
-            style={{ fontSize: 12, minWidth: 72,
+            style={{ fontSize: 13, minWidth: 72,
               ...(r?.success === true ? { background: 'rgba(74,222,128,0.2)', color: '#4ADE80',
                 border: '1px solid rgba(74,222,128,0.4)' } : {}) }}>
             Succès
@@ -75,7 +75,7 @@ function PairRow({
           <Button size="sm"
             variant={r?.success === false ? 'default' : 'outline'}
             onClick={() => setSuccess(false)}
-            style={{ fontSize: 12, minWidth: 72,
+            style={{ fontSize: 13, minWidth: 72,
               ...(r?.success === false ? { background: 'rgba(248,113,113,0.2)', color: '#F87171',
                 border: '1px solid rgba(248,113,113,0.4)' } : {}) }}>
             Échec
@@ -85,7 +85,7 @@ function PairRow({
         {r !== undefined && (
           <>
             <Select value={r.child_species_name} onValueChange={setChildSpecies}>
-              <SelectTrigger style={{ width: 190, fontSize: 12 }}><SelectValue /></SelectTrigger>
+              <SelectTrigger style={{ width: 190, fontSize: 13 }}><SelectValue /></SelectTrigger>
               <SelectContent>
                 {allSpecies.map((name) => (
                   <SelectItem key={name} value={name}>{name}</SelectItem>
@@ -98,7 +98,7 @@ function PairRow({
                 <Button key={s} size="sm"
                   variant={r.child_sex === s ? 'default' : 'outline'}
                   onClick={() => setChildSex(s)}
-                  style={{ fontSize: 13, minWidth: 36,
+                  style={{ fontSize: 15, minWidth: 36,
                     ...(r.child_sex === s
                       ? s === 'F'
                         ? { background: 'rgba(244,114,182,0.2)', color: PINK, border: '1px solid rgba(244,114,182,0.4)' }
@@ -120,10 +120,13 @@ export function EnclosView() {
   const cascadeItems = useCascadeStore((s) => s.items)
   const allSpecies = useMemo(() => cascadeItems.map((i) => i.species_name), [cascadeItems])
 
+  useEffect(() => { if (plan) setSubmitResult(null) }, [plan])
+
   const [currentIdx, setCurrentIdx] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitErrors, setSubmitErrors] = useState<BatchBreedError[]>([])
   const [networkError, setNetworkError] = useState<string | null>(null)
+  const [submitResult, setSubmitResult] = useState<BatchBreedResult | null>(null)
 
   const totalPairs = plan?.enclos.reduce((a, e) => a + e.pairs.length, 0) ?? 0
   const filledCount = Object.keys(results).length
@@ -140,7 +143,11 @@ export function EnclosView() {
     setNetworkError(null)
     try {
       const result = await submitBatch()
-      if (result.errors.length > 0) setSubmitErrors(result.errors)
+      if (result.errors.length > 0) {
+        setSubmitErrors(result.errors)
+      } else {
+        setSubmitResult(result)
+      }
     } catch (e) {
       setNetworkError(String(e))
     } finally {
@@ -167,6 +174,39 @@ export function EnclosView() {
       )}
 
       <PlannerForm />
+
+      {submitResult && (
+        <div style={{ borderRadius: 12, overflow: 'hidden',
+          border: '1px solid rgba(74,222,128,0.3)',
+          background: 'rgba(74,222,128,0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 20px', borderBottom: '1px solid rgba(74,222,128,0.15)' }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: '#4ADE80' }}>
+              Session enregistrée — Cycle {submitResult.cycle_number}
+            </span>
+            <button onClick={() => setSubmitResult(null)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer',
+                color: '#6B7280', fontSize: 13, padding: '2px 8px',
+                borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)' }}>
+              Fermer
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 12, padding: '16px 20px', flexWrap: 'wrap' }}>
+            {[
+              { val: submitResult.successes, label: 'succès',  color: '#4ADE80', bg: 'rgba(74,222,128,0.12)',  border: 'rgba(74,222,128,0.3)' },
+              { val: submitResult.fails,     label: 'échecs',  color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.3)' },
+              { val: submitResult.clones_auto, label: 'clones auto', color: '#A78BFA', bg: 'rgba(167,139,250,0.12)', border: 'rgba(167,139,250,0.3)' },
+            ].map(({ val, label, color, bg, border }) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 18px', borderRadius: 8, background: bg,
+                border: `1px solid ${border}` }}>
+                <span style={{ fontSize: 26, fontWeight: 700, color, fontVariantNumeric: 'tabular-nums' }}>{val}</span>
+                <span style={{ fontSize: 13, color: '#9CA3AF' }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {plan && currentEnclos && (
         <>
@@ -240,7 +280,7 @@ export function EnclosView() {
               <span style={{ fontSize: 16, fontWeight: 700, color: '#E5E7EB' }}>
                 Enclos {currentEnclos.enclos_number}
               </span>
-              <span style={{ fontSize: 12, color: '#6B7280' }}>
+              <span style={{ fontSize: 13, color: '#6B7280' }}>
                 {currentEnclos.pairs.filter((_, i) =>
                   results[`${currentEnclos.enclos_number}-${i}`] !== undefined).length
                 } / {currentEnclos.pairs.length} paires saisies

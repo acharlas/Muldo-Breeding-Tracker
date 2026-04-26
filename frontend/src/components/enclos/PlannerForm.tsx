@@ -1,21 +1,19 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { usePlannerStore } from '@/stores/planner'
 
 export function PlannerForm() {
-  const { generate, loading, plan, clearPlan } = usePlannerStore()
-  const [count, setCount] = useState(4)
+  const { generate, loading, plan, clearPlan, enclosCount, setEnclosCount } = usePlannerStore()
 
   const handlePlanify = async () => {
     if (plan) {
       if (!window.confirm('Un plan est déjà actif. Régénérer efface les résultats saisis. Continuer ?')) return
       clearPlan()
     }
-    await generate(count)
+    await generate(enclosCount)
   }
 
   return (
@@ -29,12 +27,12 @@ export function PlannerForm() {
             <label style={{ fontSize: 12, color: '#6B7280' }}>Nombre d'enclos</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Button variant="outline" size="sm"
-                onClick={() => setCount((c) => Math.max(1, c - 1))}>−</Button>
-              <Input type="number" min={1} max={6} value={count}
-                onChange={(e) => setCount(Math.min(6, Math.max(1, +e.target.value)))}
+                onClick={() => setEnclosCount(enclosCount - 1)}>−</Button>
+              <Input type="number" min={1} max={6} value={enclosCount}
+                onChange={(e) => setEnclosCount(+e.target.value)}
                 style={{ width: 64, textAlign: 'center', fontWeight: 700 }} />
               <Button variant="outline" size="sm"
-                onClick={() => setCount((c) => Math.min(6, c + 1))}>+</Button>
+                onClick={() => setEnclosCount(enclosCount + 1)}>+</Button>
               <span style={{ color: '#374151', fontSize: 12 }}>/ 6 max</span>
             </div>
           </div>
