@@ -22,7 +22,7 @@ export function Sidebar({ activeView, onNav }: Props) {
   const { baseLevel, setBaseLevel } = useSettingsStore()
 
   const changeLevel = (delta: number) => {
-    const next = Math.max(0, baseLevel + delta)
+    const next = Math.max(1, Math.min(200, baseLevel + delta))
     setBaseLevel(next)
     fetch()
   }
@@ -83,10 +83,10 @@ export function Sidebar({ activeView, onNav }: Props) {
         <div style={{ fontSize: 10, color: '#374151', letterSpacing: '0.08em',
           textTransform: 'uppercase', marginBottom: 10 }}>Niveau parents</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <button onClick={() => changeLevel(-1)} disabled={baseLevel <= 0}
+          <button onClick={() => changeLevel(-1)} disabled={baseLevel <= 1}
             style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
-              background: 'transparent', color: baseLevel <= 0 ? '#374151' : '#9CA3AF',
-              cursor: baseLevel <= 0 ? 'default' : 'pointer', fontSize: 16, lineHeight: 1,
+              background: 'transparent', color: baseLevel <= 1 ? '#374151' : '#9CA3AF',
+              cursor: baseLevel <= 1 ? 'default' : 'pointer', fontSize: 16, lineHeight: 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
           <span style={{ flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 700,
             color: '#E5E7EB', fontVariantNumeric: 'tabular-nums' }}>{baseLevel}</span>
@@ -97,7 +97,7 @@ export function Sidebar({ activeView, onNav }: Props) {
               display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
         </div>
         <div style={{ textAlign: 'center', marginTop: 6, fontSize: 12, fontWeight: 600,
-          color: successPct(baseLevel) >= 100 ? '#4ADE80' : successPct(baseLevel) >= 60 ? '#FB923C' : '#9CA3AF' }}>
+          color: successPct(baseLevel) >= 60 ? '#4ADE80' : successPct(baseLevel) >= 45 ? '#FB923C' : '#9CA3AF' }}>
           {successPct(baseLevel)}% succès
         </div>
       </div>

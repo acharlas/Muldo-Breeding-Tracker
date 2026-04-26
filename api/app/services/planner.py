@@ -7,8 +7,8 @@ from app.services.cascade import get_cascade
 
 
 def compute_success_rate(base_level: int) -> float:
-    """((level + level) * 0.15) + 0.30, capped at 1.0."""
-    return min(1.0, base_level * 0.30 + 0.30)
+    """(level1 + level2) * 0.15% + 30%, both parents same level → level * 0.003 + 0.30."""
+    return min(1.0, base_level * 0.003 + 0.30)
 
 
 async def compute_plan(db: AsyncSession, enclos_count: int, base_level: int = 0) -> dict:
