@@ -14,5 +14,8 @@ out/
 .vercel/
 
 .claude/
+.superpowers/
+docs/
+Dashboard-exemple/
 docker-compose.override.yml
 *.log
