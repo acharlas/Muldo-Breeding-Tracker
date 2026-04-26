@@ -5,11 +5,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.models import MuldoSpecies, BreedingRecipe, MuldoIndividual, SexEnum
 from app.services.cascade import get_cascade
 
-SUCCESS_CHANCE = 0.303  # base success rate
+
+def compute_success_rate(base_level: int) -> float:
+    """((level + level) * 0.15) + 0.30, capped at 1.0."""
+    return min(1.0, base_level * 0.30 + 0.30)
 
 
-async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
+async def compute_plan(db: AsyncSession, enclos_count: int, base_level: int = 0) -> dict:
     capacity = enclos_count * 5
+    success_rate = compute_success_rate(base_level)
 
     # Load optimal recipes with child species info
     recipe_rows = (
@@ -39,12 +43,17 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
         else:
             available_m[m.species_id].append(m)
 
-    # Load cascade to get remaining counts
-    cascade_items = await get_cascade(db)
+    # Load cascade with the same success_rate so remaining counts are consistent
+    cascade_items = await get_cascade(db, success_rate)
     remaining_by_name = {item["species_name"]: item["remaining"] for item in cascade_items}
 
     # Load species map
     all_species = {s.id: s for s in (await db.execute(select(MuldoSpecies))).scalars()}
+
+    # Build recipe lookup: child_species_id -> list of (recipe, child_species)
+    recipes_by_child: dict[int, list] = defaultdict(list)
+    for recipe, child_sp in recipe_rows:
+        recipes_by_child[child_sp.id].append((recipe, child_sp))
 
     # Build candidate pairs.
     # Fix 1: skip species that have met their target (remaining <= 0).
@@ -55,11 +64,11 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
     for recipe, child_species in recipe_rows:
         remaining = remaining_by_name.get(child_species.name, 0)
         if remaining <= 0:
-            continue  # Fix 1: target already met
+            continue
 
         directions = [(recipe.parent_f_species_id, recipe.parent_m_species_id)]
         if recipe.parent_f_species_id != recipe.parent_m_species_id:
-            directions.append((recipe.parent_m_species_id, recipe.parent_f_species_id))  # Fix 2
+            directions.append((recipe.parent_m_species_id, recipe.parent_f_species_id))
 
         for f_sid, m_sid in directions:
             key = (child_species.id, f_sid, m_sid)
@@ -84,9 +93,7 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
     # Sort: child generation ASC, then remaining DESC
     candidates.sort(key=lambda c: (c["child_species"].generation, -c["remaining"]))
 
-    # Fix 3: proportional slot allocation weighted by remaining.
-    # Each candidate gets ceil(remaining / total_remaining * capacity) slots,
-    # capped by available parents. Trim rounding excess from lowest-priority candidates.
+    # Fix 3: proportional slot allocation weighted by remaining
     total_weight = sum(c["remaining"] for c in candidates)
     for c in candidates:
         max_pairs = min(len(c["pf"]), len(c["pm"]))
@@ -96,7 +103,7 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
         else:
             c["budget"] = max_pairs
 
-    # Trim ceil over-allocation from the back (lowest priority)
+    # Trim ceil over-allocation from lowest-priority candidates
     total_budgeted = sum(c["budget"] for c in candidates)
     for i in range(len(candidates) - 1, -1, -1):
         if total_budgeted <= capacity:
@@ -105,33 +112,89 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
         candidates[i]["budget"] -= cut
         total_budgeted -= cut
 
-    # If still over (more candidates than capacity, each at budget=1), drop lowest-priority
     while total_budgeted > capacity:
         candidates.pop()
         total_budgeted -= 1
 
-    # Assign pairs respecting per-candidate budget (each individual used at most once)
+    # Pair assignment helpers
     used_ids: set[int] = set()
     pairs: list[dict] = []
 
-    for cand in candidates:
+    def _take_pairs(cand: dict, limit: int) -> None:
         count = 0
-        while count < cand["budget"] and len(pairs) < capacity:
+        while count < limit and len(pairs) < capacity:
             pf = next((m for m in cand["pf"] if m.id not in used_ids), None)
             pm = next((m for m in cand["pm"] if m.id not in used_ids), None)
             if pf is None or pm is None:
                 break
-
             used_ids.add(pf.id)
             used_ids.add(pm.id)
-
             pairs.append({
-                "parent_f": {"id": pf.id, "species_name": all_species[pf.species_id].name, "sex": "F"},
-                "parent_m": {"id": pm.id, "species_name": all_species[pm.species_id].name, "sex": "M"},
+                "parent_f": {"id": pf.id, "species_name": all_species[pf.species_id].name, "sex": "F", "_sid": pf.species_id},
+                "parent_m": {"id": pm.id, "species_name": all_species[pm.species_id].name, "sex": "M", "_sid": pm.species_id},
                 "target_child_species": cand["child_species"].name,
-                "success_chance": SUCCESS_CHANCE,
+                "success_chance": success_rate,
             })
             count += 1
+
+    # Phase 1: budget-limited proportional allocation
+    for cand in candidates:
+        _take_pairs(cand, cand["budget"])
+
+    # Lookahead: count how many times each species is consumed as a parent
+    consumed: dict[int, int] = defaultdict(int)
+    for p in pairs:
+        consumed[p["parent_f"]["_sid"]] += 1
+        consumed[p["parent_m"]["_sid"]] += 1
+
+    # Phase 2: replenishment — breed replacements for consumed parents that are "done"
+    replenishment: list[dict] = []
+    for sid, count in consumed.items():
+        sp = all_species[sid]
+        if remaining_by_name.get(sp.name, 0) > 0:
+            continue  # already a primary target
+        if sp.generation <= 1:
+            continue  # Gen 1 can only be captured, not bred
+        # Find recipes that produce this species
+        for recipe, child_sp in recipes_by_child.get(sid, []):
+            directions = [(recipe.parent_f_species_id, recipe.parent_m_species_id)]
+            if recipe.parent_f_species_id != recipe.parent_m_species_id:
+                directions.append((recipe.parent_m_species_id, recipe.parent_f_species_id))
+            for f_sid, m_sid in directions:
+                key = (sid, f_sid, m_sid)
+                if key in seen:
+                    continue
+                seen.add(key)
+                pf_av = list(available_f.get(f_sid, []))
+                pm_av = list(available_m.get(m_sid, []))
+                if not pf_av or not pm_av:
+                    continue
+                replenishment.append({
+                    "child_species": child_sp,
+                    "f_sid": f_sid,
+                    "m_sid": m_sid,
+                    "pf": pf_av,
+                    "pm": pm_av,
+                    "remaining": count,
+                    "budget": count,
+                })
+
+    for cand in replenishment:
+        if len(pairs) >= capacity:
+            break
+        _take_pairs(cand, cand["budget"])
+
+    # Phase 3: greedy fill to keep enclos full (cheaper per-enclos cost)
+    if len(pairs) < capacity:
+        for cand in candidates + replenishment:
+            if len(pairs) >= capacity:
+                break
+            _take_pairs(cand, capacity)
+
+    # Strip internal _sid before building response
+    for p in pairs:
+        p["parent_f"].pop("_sid", None)
+        p["parent_m"].pop("_sid", None)
 
     # Pack pairs into enclos (5 per enclos)
     enclos = []
@@ -142,15 +205,14 @@ async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
         })
 
     total_pairs = len(pairs)
-    estimated_successes = round(total_pairs * SUCCESS_CHANCE, 2)
+    estimated_successes = round(total_pairs * success_rate, 2)
 
-    # Per-species remaining estimate (fix cosmetic: was cross-species aggregate before)
     pairs_by_species: dict[str, int] = defaultdict(int)
     for p in pairs:
         pairs_by_species[p["target_child_species"]] += 1
 
     remaining_after = sum(
-        max(0, remaining_by_name.get(name, 0) - round(count * SUCCESS_CHANCE))
+        max(0, remaining_by_name.get(name, 0) - round(count * success_rate))
         for name, count in pairs_by_species.items()
     ) + sum(
         rem for name, rem in remaining_by_name.items()

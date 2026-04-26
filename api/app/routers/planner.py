@@ -9,4 +9,4 @@ router = APIRouter(prefix="/api")
 
 @router.post("/plan", response_model=PlanResult)
 async def plan(body: PlanRequest, db: AsyncSession = Depends(get_db)):
-    return await compute_plan(db, body.enclos_count)
+    return await compute_plan(db, body.enclos_count, body.base_level)

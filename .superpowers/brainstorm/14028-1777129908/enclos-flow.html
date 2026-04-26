@@ -1,0 +1,260 @@
+<h2>Enclos — Comment saisir les résultats ?</h2>
+<p class="subtitle">Après que le plan est affiché, comment l'utilisateur enregistre-t-il les élevages réels ?</p>
+
+<style>
+  .flow-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 24px; }
+
+  /* dark game-style palette */
+  .mock-shell {
+    background: #0f0f13;
+    border: 1px solid rgba(220,220,230,0.15);
+    border-radius: 12px;
+    padding: 14px;
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    color: #9CA3AF;
+  }
+  .mock-pair {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 11px;
+  }
+  .mock-f { color: #D1D5DB; }
+  .mock-m { color: #9CA3AF; }
+  .mock-x { color: #374151; font-weight: 700; }
+  .mock-target { margin-left: auto; color: #6B7280; }
+  .mock-tag {
+    padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600;
+    background: rgba(220,220,230,0.12); border: 1px solid rgba(220,220,230,0.2); color: #E5E7EB;
+  }
+  .mock-btn {
+    padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: default;
+    border: 1px solid rgba(220,220,230,0.3);
+    background: rgba(220,220,230,0.1); color: #E5E7EB; font-weight: 600;
+  }
+  .mock-btn-success {
+    background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #F9FAFB;
+  }
+  .mock-btn-fail {
+    background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); color: #6B7280;
+  }
+  .mock-toggle {
+    display: flex; gap: 4px;
+  }
+  .mock-input-sm {
+    width: 80px; background: rgba(255,255,255,0.06); border: 1px solid rgba(220,220,230,0.2);
+    border-radius: 5px; padding: 3px 6px; color: #E5E7EB; font-size: 10px;
+  }
+  .mock-divider { height: 1px; background: rgba(220,220,230,0.08); margin: 8px 0; }
+  .mock-submit {
+    width: 100%; padding: 7px; border-radius: 7px; border: none;
+    background: linear-gradient(135deg, #E5E7EB, #9CA3AF);
+    color: #0f0f13; font-weight: 700; font-size: 11px; cursor: default; margin-top: 8px;
+  }
+  .mock-section-label {
+    font-size: 10px; color: #374151; text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 8px; font-weight: 600;
+  }
+  .mock-step-badge {
+    width: 18px; height: 18px; border-radius: 50%; background: rgba(220,220,230,0.15);
+    border: 1px solid rgba(220,220,230,0.3); color: #E5E7EB; font-size: 9px;
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .mock-chip {
+    padding: 2px 8px; border-radius: 10px; font-size: 10px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #6B7280;
+  }
+  .mock-chip-done {
+    background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #F9FAFB;
+  }
+</style>
+
+<div class="flow-cards">
+
+  <!-- Option A -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Saisie inline sur les paires</h3>
+      <p>Chaque carte de paire a des boutons Succès / Échec intégrés + un sélecteur d'espèce enfant. Un bouton "Enregistrer la session" envoie tout en une fois.</p>
+
+      <div class="mock-shell" style="margin-top:12px">
+        <div class="mock-section-label">Enclos 1 — 3 paires</div>
+
+        <div class="mock-pair">
+          <span class="mock-step-badge">1</span>
+          <span class="mock-f">♀ Doré</span>
+          <span class="mock-x">×</span>
+          <span class="mock-m">♂ Pourpre</span>
+          <span class="mock-target">→ Doré et Pourpre</span>
+          <div class="mock-toggle">
+            <button class="mock-btn mock-btn-success" style="pointer-events:none">✓ Succès</button>
+            <button class="mock-btn" style="pointer-events:none">✕</button>
+          </div>
+        </div>
+
+        <div class="mock-pair">
+          <span class="mock-step-badge">2</span>
+          <span class="mock-f">♀ Indigo</span>
+          <span class="mock-x">×</span>
+          <span class="mock-m">♂ Ebène</span>
+          <span class="mock-target">→ Ebène et Indigo</span>
+          <div class="mock-toggle">
+            <button class="mock-btn" style="pointer-events:none">✓</button>
+            <button class="mock-btn mock-btn-fail" style="pointer-events:none">✕ Échec</button>
+          </div>
+        </div>
+
+        <div class="mock-pair" style="opacity:0.5">
+          <span class="mock-step-badge">3</span>
+          <span class="mock-f">♀ Orchidée</span>
+          <span class="mock-x">×</span>
+          <span class="mock-m">♂ Saphir</span>
+          <span class="mock-target">→ ?</span>
+          <span class="mock-chip">En attente</span>
+        </div>
+
+        <div class="mock-divider"></div>
+        <button class="mock-submit" style="pointer-events:none">Enregistrer la session (2/3 saisis)</button>
+      </div>
+
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pour</h4><ul>
+          <li>Tout sur un seul écran</li>
+          <li>Soumission groupée (batch)</li>
+        </ul></div>
+        <div class="cons"><h4>Contre</h4><ul>
+          <li>Écran chargé</li>
+          <li>Doit tout saisir avant d'envoyer</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Deux étapes séparées</h3>
+      <p>Étape 1 : Planifier. Étape 2 : Saisir les résultats. Deux modes bien distincts, l'écran de résultats remplace le plan.</p>
+
+      <div class="mock-shell" style="margin-top:12px">
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <div class="mock-chip mock-chip-done">① Plan généré</div>
+          <div style="color:#374151;font-size:10px;align-self:center">→</div>
+          <div class="mock-chip mock-chip-done" style="border-color:rgba(220,220,230,0.4);color:#E5E7EB">② Saisie en cours</div>
+        </div>
+
+        <div class="mock-section-label">Résultats — Cycle 7</div>
+
+        <div class="mock-pair">
+          <span class="mock-step-badge">1</span>
+          <span class="mock-f">♀ Doré</span>
+          <span class="mock-x">×</span>
+          <span class="mock-m">♂ Pourpre</span>
+          <span class="mock-chip mock-chip-done" style="margin-left:auto">✓</span>
+        </div>
+
+        <div class="mock-pair" style="border-color:rgba(220,220,230,0.25)">
+          <span class="mock-step-badge">2</span>
+          <span class="mock-f">♀ Indigo</span>
+          <span class="mock-x">×</span>
+          <span class="mock-m">♂ Ebène</span>
+          <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+            <select class="mock-input-sm" style="pointer-events:none">
+              <option>Echec → Orchidée</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mock-pair" style="opacity:0.4">
+          <span class="mock-step-badge">3</span>
+          <span style="color:#6B7280">Orchidée × Saphir</span>
+          <span class="mock-chip" style="margin-left:auto">—</span>
+        </div>
+
+        <div class="mock-divider"></div>
+        <button class="mock-submit" style="pointer-events:none">Soumettre le cycle</button>
+      </div>
+
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pour</h4><ul>
+          <li>Flux clair étape par étape</li>
+          <li>Moins chargé visuellement</li>
+        </ul></div>
+        <div class="cons"><h4>Contre</h4><ul>
+          <li>Plus de clics pour accéder aux résultats</li>
+          <li>Retour au plan impossible sans re-générer</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Plan + saisie côte à côte</h3>
+      <p>Le plan reste visible à gauche. À droite, un formulaire de saisie rapide par paire. Idéal pour consulter le plan tout en saisissant.</p>
+
+      <div class="mock-shell" style="margin-top:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div class="mock-section-label">Plan</div>
+            <div class="mock-pair" style="flex-direction:column;align-items:flex-start;gap:3px">
+              <div style="display:flex;gap:4px;width:100%">
+                <span class="mock-f">♀ Doré</span>
+                <span class="mock-x">×</span>
+                <span class="mock-m">♂ Pourpre</span>
+              </div>
+              <div class="mock-target" style="margin-left:0;font-size:10px">→ Doré et Pourpre · 55%</div>
+            </div>
+            <div class="mock-pair" style="flex-direction:column;align-items:flex-start;gap:3px;opacity:0.5">
+              <div style="display:flex;gap:4px;width:100%">
+                <span class="mock-f">♀ Indigo</span>
+                <span class="mock-x">×</span>
+                <span class="mock-m">♂ Ebène</span>
+              </div>
+              <div class="mock-target" style="margin-left:0;font-size:10px">→ Ebène et Indigo · 55%</div>
+            </div>
+          </div>
+          <div>
+            <div class="mock-section-label">Résultats</div>
+            <div class="mock-pair" style="flex-direction:column;align-items:flex-start;gap:4px">
+              <div style="font-size:10px;color:#E5E7EB">Paire 1</div>
+              <div class="mock-toggle">
+                <button class="mock-btn mock-btn-success" style="pointer-events:none;font-size:9px">✓ Succès</button>
+                <button class="mock-btn" style="pointer-events:none;font-size:9px">✕ Échec</button>
+              </div>
+            </div>
+            <div class="mock-pair" style="flex-direction:column;align-items:flex-start;gap:4px;opacity:0.5">
+              <div style="font-size:10px;color:#6B7280">Paire 2</div>
+              <span class="mock-chip">À remplir</span>
+            </div>
+          </div>
+        </div>
+        <div class="mock-divider"></div>
+        <button class="mock-submit" style="pointer-events:none">Enregistrer (1/2)</button>
+      </div>
+
+      <div class="pros-cons" style="margin-top:10px">
+        <div class="pros"><h4>Pour</h4><ul>
+          <li>Plan toujours visible</li>
+          <li>Saisie rapide</li>
+        </ul></div>
+        <div class="cons"><h4>Contre</h4><ul>
+          <li>Écran plus dense</li>
+          <li>Difficile sur petit écran</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

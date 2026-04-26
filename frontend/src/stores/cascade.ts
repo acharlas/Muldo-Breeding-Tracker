@@ -22,7 +22,9 @@ export const useCascadeStore = create<CascadeStore>()(
       fetch: async () => {
         set({ loading: true, error: null })
         try {
-          const items = await apiCalls.getCascade()
+          const { useSettingsStore } = await import('./settings')
+          const baseLevel = useSettingsStore.getState().baseLevel
+          const items = await apiCalls.getCascade(baseLevel)
           set({ items, loading: false })
         } catch (e) {
           set({ error: String(e), loading: false })

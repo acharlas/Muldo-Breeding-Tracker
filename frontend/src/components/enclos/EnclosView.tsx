@@ -129,6 +129,28 @@ export function EnclosView() {
   const [submitResult, setSubmitResult] = useState<BatchBreedResult | null>(null)
 
   const totalPairs = plan?.enclos.reduce((a, e) => a + e.pairs.length, 0) ?? 0
+
+  const parentNeeds = useMemo(() => {
+    if (!plan) return []
+    const counts: Record<string, number> = {}
+    for (const enclos of plan.enclos) {
+      for (const pair of enclos.pairs) {
+        const kf = `${pair.parent_f.species_name}|F`
+        const km = `${pair.parent_m.species_name}|M`
+        counts[kf] = (counts[kf] ?? 0) + 1
+        counts[km] = (counts[km] ?? 0) + 1
+      }
+    }
+    return Object.entries(counts)
+      .map(([key, count]) => {
+        const [species, sex] = key.split('|')
+        return { species, sex, count }
+      })
+      .sort((a, b) => {
+        if (a.sex !== b.sex) return a.sex === 'F' ? -1 : 1
+        return a.species.localeCompare(b.species)
+      })
+  }, [plan])
   const filledCount = Object.keys(results).length
   const allFilled = filledCount === totalPairs && totalPairs > 0
   const hasPersistedData = plan !== null
@@ -227,6 +249,33 @@ export function EnclosView() {
               </div>
             ))}
           </div>
+
+          {/* Parents needed summary */}
+          {parentNeeds.length > 0 && (
+            <div style={{ padding: '12px 16px', borderRadius: 10,
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(220,220,230,0.1)' }}>
+              <div style={{ fontSize: 11, color: '#6B7280', letterSpacing: '0.06em',
+                textTransform: 'uppercase', marginBottom: 10 }}>
+                Parents à mettre en enclos
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {parentNeeds.map(({ species, sex, count }) => (
+                  <span key={`${species}|${sex}`}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 5,
+                      padding: '4px 10px', borderRadius: 6, fontSize: 13, fontWeight: 500,
+                      background: sex === 'F' ? 'rgba(244,114,182,0.1)' : 'rgba(96,165,250,0.1)',
+                      border: `1px solid ${sex === 'F' ? 'rgba(244,114,182,0.25)' : 'rgba(96,165,250,0.25)'}`,
+                      color: '#E5E7EB' }}>
+                    <span style={{ fontWeight: 700, color: sex === 'F' ? PINK : BLUE }}>
+                      {count}
+                    </span>
+                    {species}
+                    <span style={{ color: sex === 'F' ? PINK : BLUE }}>{sex === 'F' ? '♀' : '♂'}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Enclos tabs + navigation */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

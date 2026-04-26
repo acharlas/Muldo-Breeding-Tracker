@@ -9,7 +9,7 @@ type PlannerStore = {
   enclosCount: number
   loading: boolean
   setEnclosCount: (n: number) => void
-  generate: (enclosCount: number) => Promise<void>
+  generate: () => Promise<void>
   setResult: (key: string, result: PairResult) => void
   submitBatch: () => Promise<BatchBreedResult>
   clearPlan: () => void
@@ -25,10 +25,13 @@ export const usePlannerStore = create<PlannerStore>()(
 
       setEnclosCount: (n) => set({ enclosCount: Math.min(6, Math.max(1, n)) }),
 
-      generate: async (enclosCount) => {
+      generate: async () => {
+        const { enclosCount } = get()
+        const { useSettingsStore } = await import('./settings')
+        const baseLevel = useSettingsStore.getState().baseLevel
         set({ loading: true })
         try {
-          const plan = await apiCalls.getPlan(enclosCount)
+          const plan = await apiCalls.getPlan(enclosCount, baseLevel)
           set({ plan, results: {}, loading: false })
         } catch (e) {
           set({ loading: false })

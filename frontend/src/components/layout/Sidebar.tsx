@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { BarChart2, Package, LayoutGrid, History } from 'lucide-react'
 import { useCascadeStore } from '@/stores/cascade'
+import { useSettingsStore, successPct } from '@/stores/settings'
 
 type View = 'cascade' | 'inventaire' | 'enclos' | 'historique'
 
@@ -17,6 +18,14 @@ type Props = { activeView: View; onNav: (v: View) => void }
 
 export function Sidebar({ activeView, onNav }: Props) {
   const items = useCascadeStore((s) => s.items)
+  const fetch = useCascadeStore((s) => s.fetch)
+  const { baseLevel, setBaseLevel } = useSettingsStore()
+
+  const changeLevel = (delta: number) => {
+    const next = Math.max(0, baseLevel + delta)
+    setBaseLevel(next)
+    fetch()
+  }
   const ok       = items.filter((i) => i.status === 'ok').length
   const en_cours = items.filter((i) => i.status === 'en_cours').length
   const a_faire  = items.filter((i) => i.status === 'a_faire').length
@@ -67,6 +76,32 @@ export function Sidebar({ activeView, onNav }: Props) {
         })}
       </nav>
 
+      {/* Level setting */}
+      <div style={{ margin: '0 12px 10px', padding: '12px 14px',
+        background: 'rgba(220,220,230,0.05)', borderRadius: 10,
+        border: '1px solid rgba(220,220,230,0.1)' }}>
+        <div style={{ fontSize: 10, color: '#374151', letterSpacing: '0.08em',
+          textTransform: 'uppercase', marginBottom: 10 }}>Niveau parents</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => changeLevel(-1)} disabled={baseLevel <= 0}
+            style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
+              background: 'transparent', color: baseLevel <= 0 ? '#374151' : '#9CA3AF',
+              cursor: baseLevel <= 0 ? 'default' : 'pointer', fontSize: 16, lineHeight: 1,
+              display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+          <span style={{ flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 700,
+            color: '#E5E7EB', fontVariantNumeric: 'tabular-nums' }}>{baseLevel}</span>
+          <button onClick={() => changeLevel(+1)}
+            style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
+              background: 'transparent', color: '#9CA3AF',
+              cursor: 'pointer', fontSize: 16, lineHeight: 1,
+              display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 6, fontSize: 12, fontWeight: 600,
+          color: successPct(baseLevel) >= 100 ? '#4ADE80' : successPct(baseLevel) >= 60 ? '#FB923C' : '#9CA3AF' }}>
+          {successPct(baseLevel)}% succès
+        </div>
+      </div>
+
       {/* Quick stats */}
       <div style={{ margin: '0 12px 12px', padding: 14,
         background: 'rgba(220,220,230,0.05)', borderRadius: 10,
@@ -87,7 +122,7 @@ export function Sidebar({ activeView, onNav }: Props) {
       </div>
 
       <div style={{ padding: '14px 20px', borderTop: '1px solid rgba(220,220,230,0.08)' }}>
-        <div style={{ fontSize: 11, color: '#374151' }}>v1.0.0 · Saison 4</div>
+        <div style={{ fontSize: 11, color: '#374151' }}>v1.0.0</div>
       </div>
     </aside>
   )

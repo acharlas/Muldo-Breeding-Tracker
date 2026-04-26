@@ -9,6 +9,7 @@ def compute_cascade(
     all_species: list,
     optimal_recipes: list,
     owned_fertile: dict[int, int],  # species_id -> total fertile count
+    success_rate: float = 0.30,
 ) -> list[dict]:
     """Pure calculation function. Processes Gen 10 → Gen 1 top-down.
 
@@ -40,7 +41,7 @@ def compute_cascade(
                     math.ceil(remaining.get(child_id, 0) / 2)
                     for child_id in children_of[species.id]
                 )
-                target[species.id] = total
+                target[species.id] = math.ceil(total / success_rate)
             owned = owned_fertile.get(species.id, 0)
             remaining[species.id] = max(0, target[species.id] - owned)
 
@@ -74,7 +75,7 @@ def compute_cascade(
     return result
 
 
-async def get_cascade(db: AsyncSession) -> list[dict]:
+async def get_cascade(db: AsyncSession, success_rate: float = 0.30) -> list[dict]:
     """Fetch data from DB and run compute_cascade."""
     all_species = list((await db.execute(select(MuldoSpecies))).scalars())
 
@@ -102,7 +103,7 @@ async def get_cascade(db: AsyncSession) -> list[dict]:
         else:
             fertile_m_per_species[species_id] += 1
 
-    items = compute_cascade(all_species, optimal_recipes, dict(owned_fertile))
+    items = compute_cascade(all_species, optimal_recipes, dict(owned_fertile), success_rate)
 
     # Fill in per-sex fertile counts
     species_by_name = {s.name: s for s in all_species}

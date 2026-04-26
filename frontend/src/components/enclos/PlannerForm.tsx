@@ -13,7 +13,7 @@ export function PlannerForm() {
       if (!window.confirm('Un plan est déjà actif. Régénérer efface les résultats saisis. Continuer ?')) return
       clearPlan()
     }
-    await generate(enclosCount)
+    await generate()
   }
 
   return (
