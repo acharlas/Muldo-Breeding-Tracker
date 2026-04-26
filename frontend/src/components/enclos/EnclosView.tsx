@@ -102,7 +102,7 @@ function PairRow({
                     ...(r.child_sex === s
                       ? s === 'F'
                         ? { background: 'rgba(244,114,182,0.2)', color: PINK, border: '1px solid rgba(244,114,182,0.4)' }
-                        : { background: 'rgba(96,165,250,0.2)',  color: BLUE, border: '1px solid rgba(96,165,250,0.4)' }
+                        : { background: 'rgba(96,165,250,0.25)', color: '#FFFFFF', border: '1px solid rgba(96,165,250,0.5)' }
                       : {}) }}>
                   {s === 'F' ? '♀' : '♂'}
                 </Button>

@@ -45,7 +45,7 @@ export function PlannerForm() {
           </div>
           <div style={{ marginLeft: 'auto' }}>
             <Button onClick={handlePlanify} disabled={loading}>
-              {loading ? 'Planification…' : '⚡ Planifier'}
+              {loading ? 'Planification…' : 'Planifier'}
             </Button>
           </div>
         </div>
