@@ -33,6 +33,8 @@ export const api = {
       body: JSON.stringify(body),
     }),
   delete: <T>(path: string) => apiFetch<T>(path, { method: 'DELETE' }),
+  deleteWithStatus: <T>(path: string) =>
+    apiFetch<T>(path, { method: 'DELETE' }),
 }
 
 export const apiCalls = {
@@ -47,4 +49,8 @@ export const apiCalls = {
     api.post<PlanResult>('/api/plan', { enclos_count }),
   submitBatch: (results: BreedRequest[]) =>
     api.post<BatchBreedResult>('/api/breed/batch', { results }),
+  removeBySpecies: (species_name: string, sex: 'F' | 'M', count: number) =>
+    api.deleteWithStatus<{ removed: number }>(
+      `/api/inventory/by-species?species_name=${encodeURIComponent(species_name)}&sex=${sex}&count=${count}`
+    ),
 }

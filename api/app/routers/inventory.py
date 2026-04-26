@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.schemas.schemas import MuldoOut, InventoryEntry, InventoryStats, CaptureRequest, BulkCaptureRequest
@@ -43,6 +43,17 @@ async def bulk_capture(body: BulkCaptureRequest, db: AsyncSession = Depends(get_
 @router.get("/stats", response_model=InventoryStats)
 async def get_stats(db: AsyncSession = Depends(get_db)):
     return await inv_svc.get_stats(db)
+
+
+@router.delete("/by-species", status_code=200)
+async def remove_by_species(
+    species_name: str = Query(...),
+    sex: str = Query(...),
+    count: int = Query(1, ge=1),
+    db: AsyncSession = Depends(get_db),
+):
+    removed = await inv_svc.remove_by_species(db, species_name, sex, count)
+    return {"removed": removed}
 
 
 @router.delete("/{muldo_id}", status_code=204)

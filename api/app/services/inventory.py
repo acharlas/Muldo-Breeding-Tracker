@@ -46,6 +46,27 @@ async def bulk_capture(db: AsyncSession, species_name: str, sex: str, count: int
     return muldos
 
 
+async def remove_by_species(db: AsyncSession, species_name: str, sex: str, count: int) -> int:
+    species = await _get_species_or_404(db, species_name)
+    rows = list(
+        (await db.execute(
+            select(MuldoIndividual)
+            .where(
+                MuldoIndividual.species_id == species.id,
+                MuldoIndividual.sex == SexEnum(sex),
+            )
+            .order_by(MuldoIndividual.created_at.desc(), MuldoIndividual.id.desc())
+            .limit(count)
+        )).scalars()
+    )
+    if not rows:
+        raise HTTPException(status_code=404, detail=f"No {sex} of '{species_name}' found")
+    for m in rows:
+        await db.delete(m)
+    await db.commit()
+    return len(rows)
+
+
 async def delete_muldo(db: AsyncSession, muldo_id: int) -> None:
     result = await db.execute(select(MuldoIndividual).where(MuldoIndividual.id == muldo_id))
     muldo = result.scalar_one_or_none()

@@ -8,6 +8,7 @@ type InventoryStore = {
   loading: boolean
   fetch: () => Promise<void>
   capture: (speciesName: string, sex: 'F' | 'M', count?: number) => Promise<void>
+  remove: (speciesName: string, sex: 'F' | 'M', count?: number) => Promise<void>
 }
 
 export const useInventoryStore = create<InventoryStore>()((set) => ({
@@ -33,6 +34,14 @@ export const useInventoryStore = create<InventoryStore>()((set) => ({
     } else {
       await apiCalls.bulkCapture(speciesName, sex, count)
     }
+    const [inventory, stats] = await Promise.all([
+      apiCalls.getInventory(),
+      apiCalls.getInventoryStats(),
+    ])
+    set({ inventory, stats })
+  },
+  remove: async (speciesName, sex, count = 1) => {
+    await apiCalls.removeBySpecies(speciesName, sex, count)
     const [inventory, stats] = await Promise.all([
       apiCalls.getInventory(),
       apiCalls.getInventoryStats(),
