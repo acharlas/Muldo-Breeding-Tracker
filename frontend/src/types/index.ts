@@ -89,3 +89,24 @@ export type PairResult = {
   child_species_name: string
   child_sex: 'F' | 'M'
 }
+
+export type PairHistory = {
+  parent_f_species: string
+  parent_m_species: string
+  child_species: string
+  child_sex: string
+  success: boolean
+}
+
+export type CloneHistory = {
+  species_name: string
+  sex: string
+}
+
+export type CycleHistory = {
+  cycle_number: number
+  date: string
+  pairs: PairHistory[]
+  clones: CloneHistory[]
+  summary: { total: number; successes: number; fails: number; clones: number }
+}

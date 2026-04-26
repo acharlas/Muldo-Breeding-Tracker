@@ -6,6 +6,7 @@ import type {
   PlanResult,
   BatchBreedResult,
   BreedRequest,
+  CycleHistory,
 } from '@/types'
 
 // Server components use the internal Docker network URL.
@@ -53,4 +54,5 @@ export const apiCalls = {
     api.deleteWithStatus<{ removed: number }>(
       `/api/inventory/by-species?species_name=${encodeURIComponent(species_name)}&sex=${sex}&count=${count}&is_fertile=${is_fertile}`
     ),
+  getHistory: () => api.get<CycleHistory[]>('/api/history'),
 }
