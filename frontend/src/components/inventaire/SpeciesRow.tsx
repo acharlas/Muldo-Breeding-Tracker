@@ -33,6 +33,23 @@ function CountInput({ value, onChange }: { value: number; onChange: (v: number) 
   )
 }
 
+function SterileCell({ count }: { count: number }) {
+  const clones = Math.floor(count / 2)
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: count > 0 ? '#D1D5DB' : '#6B7280' }}>
+      {count}
+      {clones > 0 && (
+        <span title={`${clones} clone${clones > 1 ? 's' : ''} prêt${clones > 1 ? 's' : ''}`}
+          style={{ fontSize: 11, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
+            background: 'rgba(167,139,250,0.15)', color: '#A78BFA',
+            border: '1px solid rgba(167,139,250,0.35)', cursor: 'default' }}>
+          ⟳{clones}
+        </span>
+      )}
+    </span>
+  )
+}
+
 export function InventaireSpeciesRow({ speciesName, generation, entry }: Props) {
   const capture = useInventoryStore((s) => s.capture)
   const remove  = useInventoryStore((s) => s.remove)
@@ -78,8 +95,8 @@ export function InventaireSpeciesRow({ speciesName, generation, entry }: Props) 
 
   if (editing) {
     return (
-      <TableRow style={{ background: 'rgba(220,220,230,0.04)' }}>
-        <TableCell className="font-medium text-sm">{speciesName}</TableCell>
+      <TableRow style={{ background: 'rgba(220,220,230,0.04)', fontSize: 15 }}>
+        <TableCell className="font-medium">{speciesName}</TableCell>
         <TableCell><GenBadge gen={generation} /></TableCell>
         <TableCell className="text-center">
           <CountInput value={draft.fertile_f} onChange={set('fertile_f')} />
@@ -117,13 +134,13 @@ export function InventaireSpeciesRow({ speciesName, generation, entry }: Props) 
   }
 
   return (
-    <TableRow>
-      <TableCell className="font-medium text-sm">{speciesName}</TableCell>
+    <TableRow style={{ fontSize: 15 }}>
+      <TableCell className="font-medium">{speciesName}</TableCell>
       <TableCell><GenBadge gen={generation} /></TableCell>
       <TableCell className="text-center" style={{ color: PINK }}>{safeEntry.fertile_f}</TableCell>
       <TableCell className="text-center" style={{ color: BLUE }}>{safeEntry.fertile_m}</TableCell>
-      <TableCell className="text-center text-muted-foreground">{safeEntry.sterile_f}</TableCell>
-      <TableCell className="text-center text-muted-foreground">{safeEntry.sterile_m}</TableCell>
+      <TableCell className="text-center"><SterileCell count={safeEntry.sterile_f} /></TableCell>
+      <TableCell className="text-center"><SterileCell count={safeEntry.sterile_m} /></TableCell>
       <TableCell>
         <button onClick={startEdit}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 4,

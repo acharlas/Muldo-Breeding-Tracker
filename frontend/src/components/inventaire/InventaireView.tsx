@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Zap, Ban, Dna } from 'lucide-react'
+import { Zap, Ban, Dna, X, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,6 +11,32 @@ import { useCascadeStore } from '@/stores/cascade'
 import { useInventoryStore } from '@/stores/inventory'
 import { InventaireSpeciesRow } from './SpeciesRow'
 import { BulkCaptureModal } from './BulkCaptureModal'
+
+type SortKey = 'name' | 'gen' | 'fertile_f' | 'fertile_m' | 'sterile_f' | 'sterile_m'
+type SortDir = 'asc' | 'desc'
+
+function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey; sortDir: SortDir }) {
+  if (col !== sortKey) return <ChevronsUpDown size={12} style={{ opacity: 0.3, marginLeft: 4 }} />
+  return sortDir === 'asc'
+    ? <ChevronUp size={12} style={{ marginLeft: 4 }} />
+    : <ChevronDown size={12} style={{ marginLeft: 4 }} />
+}
+
+function SortHead({ col, label, sortKey, sortDir, onSort, style, className }: {
+  col: SortKey; label: string; sortKey: SortKey; sortDir: SortDir
+  onSort: (col: SortKey) => void; style?: React.CSSProperties; className?: string
+}) {
+  return (
+    <TableHead className={className}
+      style={{ cursor: 'pointer', userSelect: 'none', ...style }}
+      onClick={() => onSort(col)}>
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+        {label}
+        <SortIcon col={col} sortKey={sortKey} sortDir={sortDir} />
+      </span>
+    </TableHead>
+  )
+}
 
 export function InventaireView() {
   const cascadeItems = useCascadeStore((s) => s.items)
@@ -23,7 +49,6 @@ export function InventaireView() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetch, fetchCascade])
 
-  // Build generation map from cascade store
   const genMap = useMemo(() => {
     const m = new Map<string, number>()
     cascadeItems.forEach((i) => m.set(i.species_name, i.generation))
@@ -33,14 +58,46 @@ export function InventaireView() {
   const [search, setSearch] = useState('')
   const [filterGen, setFilterGen] = useState('all')
   const [showModal, setShowModal] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey>('gen')
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const handleSort = (col: SortKey) => {
+    if (col === sortKey) setSortDir((d) => d === 'asc' ? 'desc' : 'asc')
+    else { setSortKey(col); setSortDir('asc') }
+  }
 
   const speciesKeys = Object.keys(inventory)
-  const filtered = speciesKeys.filter((name) => {
-    const gen = genMap.get(name) ?? 0
-    if (filterGen !== 'all' && gen !== +filterGen) return false
-    if (search && !name.toLowerCase().includes(search.toLowerCase())) return false
-    return true
-  })
+
+  const filtered = useMemo(() => {
+    const keys = speciesKeys.filter((name) => {
+      const gen = genMap.get(name) ?? 0
+      if (filterGen !== 'all' && gen !== +filterGen) return false
+      if (search && !name.toLowerCase().includes(search.toLowerCase())) return false
+      return true
+    })
+
+    keys.sort((a, b) => {
+      let va: number | string
+      let vb: number | string
+      const ea = inventory[a] ?? { fertile_f: 0, fertile_m: 0, sterile_f: 0, sterile_m: 0 }
+      const eb = inventory[b] ?? { fertile_f: 0, fertile_m: 0, sterile_f: 0, sterile_m: 0 }
+      switch (sortKey) {
+        case 'name':    va = a; vb = b; break
+        case 'gen':     va = genMap.get(a) ?? 0; vb = genMap.get(b) ?? 0; break
+        case 'fertile_f':  va = ea.fertile_f;  vb = eb.fertile_f;  break
+        case 'fertile_m':  va = ea.fertile_m;  vb = eb.fertile_m;  break
+        case 'sterile_f':  va = ea.sterile_f;  vb = eb.sterile_f;  break
+        case 'sterile_m':  va = eb.sterile_m;  vb = eb.sterile_m;  break
+        default: return 0
+      }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1
+      if (va > vb) return sortDir === 'asc' ? 1 : -1
+      return 0
+    })
+
+    return keys
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speciesKeys.join(','), inventory, genMap, filterGen, search, sortKey, sortDir])
 
   const totalFertF = speciesKeys.reduce((a, n) => a + (inventory[n]?.fertile_f ?? 0), 0)
   const totalFertM = speciesKeys.reduce((a, n) => a + (inventory[n]?.fertile_m ?? 0), 0)
@@ -89,8 +146,19 @@ export function InventaireView() {
 
       {/* Filter bar */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 14, alignItems: 'center' }}>
-        <Input placeholder="Rechercher…" value={search}
-          onChange={(e) => setSearch(e.target.value)} style={{ width: 200 }} />
+        <div style={{ position: 'relative' }}>
+          <Input placeholder="Rechercher…" value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ width: 200, paddingRight: search ? 28 : undefined }} />
+          {search && (
+            <button onClick={() => setSearch('')}
+              style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280',
+                display: 'flex', alignItems: 'center', padding: 0 }}>
+              <X size={14} />
+            </button>
+          )}
+        </div>
         <Select value={filterGen} onValueChange={(v) => setFilterGen(v ?? 'all')}>
           <SelectTrigger style={{ width: 150 }}><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -100,6 +168,13 @@ export function InventaireView() {
             ))}
           </SelectContent>
         </Select>
+        {filterGen !== 'all' && (
+          <button onClick={() => setFilterGen('all')}
+            style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none',
+              cursor: 'pointer', color: '#6B7280', fontSize: 12 }}>
+            <X size={13} /> Gen {filterGen}
+          </button>
+        )}
         <span style={{ color: '#374151', fontSize: 12, marginLeft: 'auto' }}>{filtered.length} espèces</span>
       </div>
 
@@ -109,13 +184,13 @@ export function InventaireView() {
         {loading && <div style={{ color: '#6B7280', textAlign: 'center', padding: 40 }}>Chargement…</div>}
         <Table>
           <TableHeader>
-            <TableRow style={{ fontSize: 10, color: '#374151', letterSpacing: '0.08em' }}>
-              <TableHead>Espèce</TableHead>
-              <TableHead>Gen</TableHead>
-              <TableHead className="text-center" style={{ color: '#D1D5DB' }}>Fert ♀</TableHead>
-              <TableHead className="text-center" style={{ color: '#9CA3AF' }}>Fert ♂</TableHead>
-              <TableHead className="text-center">Stér ♀</TableHead>
-              <TableHead className="text-center">Stér ♂</TableHead>
+            <TableRow style={{ fontSize: 12, color: '#374151', letterSpacing: '0.08em' }}>
+              <SortHead col="name"      label="Espèce"     sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
+              <SortHead col="gen"       label="Gen"        sortKey={sortKey} sortDir={sortDir} onSort={handleSort} />
+              <SortHead col="fertile_f" label="Fertile ♀"  sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="text-center" style={{ color: '#F472B6' }} />
+              <SortHead col="fertile_m" label="Fertile ♂"  sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="text-center" style={{ color: '#60A5FA' }} />
+              <SortHead col="sterile_f" label="Stérile ♀"  sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="text-center" />
+              <SortHead col="sterile_m" label="Stérile ♂"  sortKey={sortKey} sortDir={sortDir} onSort={handleSort} className="text-center" />
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
