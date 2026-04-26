@@ -28,7 +28,7 @@ async def _load_species_by_name(db: AsyncSession, name: str) -> MuldoSpecies:
     return species
 
 
-async def _run_auto_clone(db: AsyncSession) -> list[dict]:
+async def _run_auto_clone(db: AsyncSession, cycle_number: int) -> list[dict]:
     """Find and process all cloneable pairs (same species + same sex, 2+ sterile). Returns list of clone records."""
     clones = []
     while True:
@@ -70,10 +70,15 @@ async def _run_auto_clone(db: AsyncSession) -> list[dict]:
         await db.flush()
 
         # Log clone (donor IDs are plain integers, not FKs; they survive donor deletion)
+        species_result = await db.execute(select(MuldoSpecies).where(MuldoSpecies.id == species_id))
+        species = species_result.scalar_one()
         log = CloneLog(
             donor_1_id=victims[0].id,
             donor_2_id=victims[1].id,
             result_id=clone.id,
+            cycle_number=cycle_number,
+            species_name=species.name,
+            sex=sex.value,
         )
         db.add(log)
         await db.flush()
@@ -84,8 +89,6 @@ async def _run_auto_clone(db: AsyncSession) -> list[dict]:
         await db.delete(victims[1])
         await db.flush()
 
-        species_result = await db.execute(select(MuldoSpecies).where(MuldoSpecies.id == species_id))
-        species = species_result.scalar_one()
         clones.append({"species_name": species.name, "sex": sex.value})
 
     return clones
@@ -116,6 +119,16 @@ async def breed(
         raise HTTPException(status_code=400, detail=f"Muldo {parent_m_id} is not fertile")
 
     child_species = await _load_species_by_name(db, child_species_name)
+
+    parent_f_species_result = await db.execute(
+        select(MuldoSpecies).where(MuldoSpecies.id == parent_f.species_id)
+    )
+    parent_f_species_name = parent_f_species_result.scalar_one().name
+
+    parent_m_species_result = await db.execute(
+        select(MuldoSpecies).where(MuldoSpecies.id == parent_m.species_id)
+    )
+    parent_m_species_name = parent_m_species_result.scalar_one().name
 
     # Validate recipe when success=True
     if success:
@@ -166,12 +179,15 @@ async def breed(
         target_species_id=child_species.id,
         success=success,
         cycle_number=cycle_number,
+        parent_f_species_name=parent_f_species_name,
+        parent_m_species_name=parent_m_species_name,
+        child_sex=child.sex.value,
     )
     db.add(log)
     await db.flush()
 
     # Auto-clone
-    clones = await _run_auto_clone(db)
+    clones = await _run_auto_clone(db, cycle_number)
 
     await db.commit()
     await db.refresh(child)

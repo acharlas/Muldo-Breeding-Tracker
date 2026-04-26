@@ -65,11 +65,11 @@ class MuldoIndividual(Base):
     is_fertile: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     origin: Mapped[OriginEnum] = mapped_column(Enum(OriginEnum), nullable=False)
     parent_f_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("muldo_individual.id", use_alter=True, name="fk_muldo_individual_parent_f"),
+        ForeignKey("muldo_individual.id", use_alter=True, name="fk_muldo_individual_parent_f", ondelete="SET NULL"),
         nullable=True,
     )
     parent_m_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("muldo_individual.id", use_alter=True, name="fk_muldo_individual_parent_m"),
+        ForeignKey("muldo_individual.id", use_alter=True, name="fk_muldo_individual_parent_m", ondelete="SET NULL"),
         nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -83,15 +83,18 @@ class BreedingLog(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     parent_f_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id", ondelete="SET NULL"), nullable=True)
     parent_m_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id", ondelete="SET NULL"), nullable=True)
-    child_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
+    child_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id", ondelete="SET NULL"), nullable=True)
     target_species_id: Mapped[int] = mapped_column(ForeignKey("muldo_species.id"), nullable=False)
     success: Mapped[bool] = mapped_column(Boolean, nullable=False)
     cycle_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    parent_f_species_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    parent_m_species_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    child_sex: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     parent_f: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_f_id], passive_deletes=True)
     parent_m: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[parent_m_id], passive_deletes=True)
-    child: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[child_id])
+    child: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[child_id], passive_deletes=True)
     target_species: Mapped["MuldoSpecies"] = relationship("MuldoSpecies", foreign_keys=[target_species_id])
 
 
@@ -103,5 +106,8 @@ class CloneLog(Base):
     donor_2_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     result_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    cycle_number: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    species_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    sex: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     result: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[result_id])
