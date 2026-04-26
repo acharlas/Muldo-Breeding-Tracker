@@ -207,9 +207,9 @@ export function EnclosView() {
               Session enregistrée — Cycle {submitResult.cycle_number}
             </span>
             <button onClick={() => setSubmitResult(null)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer',
+              style={{ background: 'none', border: '1px solid rgba(220,220,230,0.2)', cursor: 'pointer',
                 color: '#6B7280', fontSize: 13, padding: '2px 8px',
-                borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)' }}>
+                borderRadius: 6 }}>
               Fermer
             </button>
           </div>

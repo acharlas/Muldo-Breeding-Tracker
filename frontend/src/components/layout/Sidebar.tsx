@@ -19,7 +19,7 @@ type Props = { activeView: View; onNav: (v: View) => void }
 export function Sidebar({ activeView, onNav }: Props) {
   const items = useCascadeStore((s) => s.items)
   const fetch = useCascadeStore((s) => s.fetch)
-  const { baseLevel, setBaseLevel } = useSettingsStore()
+  const { baseLevel, setBaseLevel, optimakina, setOptimakina } = useSettingsStore()
 
   const changeLevel = (delta: number) => {
     const next = Math.max(1, Math.min(200, baseLevel + delta))
@@ -107,9 +107,19 @@ export function Sidebar({ activeView, onNav }: Props) {
               display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
         </div>
         <div style={{ textAlign: 'center', marginTop: 6, fontSize: 12, fontWeight: 600,
-          color: successPct(baseLevel) >= 60 ? '#4ADE80' : successPct(baseLevel) >= 45 ? '#FB923C' : '#9CA3AF' }}>
-          {successPct(baseLevel)}% succès
+          color: successPct(baseLevel, optimakina) >= 60 ? '#4ADE80' : successPct(baseLevel, optimakina) >= 45 ? '#FB923C' : '#9CA3AF' }}>
+          {successPct(baseLevel, optimakina)}% succès
         </div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8,
+          cursor: 'pointer', fontSize: 11, color: optimakina ? '#A78BFA' : '#6B7280' }}>
+          <input
+            type="checkbox"
+            checked={optimakina}
+            onChange={(e) => { setOptimakina(e.target.checked); fetch() }}
+            style={{ accentColor: '#A78BFA', cursor: 'pointer' }}
+          />
+          Optimakina (+10%)
+        </label>
       </div>
 
       {/* Quick stats */}

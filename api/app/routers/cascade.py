@@ -11,6 +11,7 @@ router = APIRouter(prefix="/api")
 async def cascade(
     db: AsyncSession = Depends(get_db),
     base_level: int = Query(default=1, ge=1, le=200),
+    optimakina: bool = Query(default=False),
 ):
-    success_rate = min(1.0, base_level * 0.003 + 0.30)
+    success_rate = min(1.0, base_level * 0.003 + 0.30 + (0.10 if optimakina else 0))
     return await get_cascade(db, success_rate)

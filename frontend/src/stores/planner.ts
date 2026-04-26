@@ -28,10 +28,10 @@ export const usePlannerStore = create<PlannerStore>()(
       generate: async () => {
         const { enclosCount } = get()
         const { useSettingsStore } = await import('./settings')
-        const baseLevel = useSettingsStore.getState().baseLevel
+        const { baseLevel, optimakina } = useSettingsStore.getState()
         set({ loading: true })
         try {
-          const plan = await apiCalls.getPlan(enclosCount, baseLevel)
+          const plan = await apiCalls.getPlan(enclosCount, baseLevel, optimakina)
           set({ plan, results: {}, loading: false })
         } catch (e) {
           set({ loading: false })

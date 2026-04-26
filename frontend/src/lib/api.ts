@@ -39,15 +39,16 @@ export const api = {
 }
 
 export const apiCalls = {
-  getCascade: (base_level = 0) => api.get<CascadeItem[]>(`/api/cascade?base_level=${base_level}`),
+  getCascade: (base_level = 0, optimakina = false) =>
+    api.get<CascadeItem[]>(`/api/cascade?base_level=${base_level}&optimakina=${optimakina}`),
   getInventory: () => api.get<Record<string, InventoryEntry>>('/api/inventory'),
   getInventoryStats: () => api.get<InventoryStats>('/api/inventory/stats'),
   capture: (species_name: string, sex: 'F' | 'M', is_fertile = true) =>
     api.post<MuldoOut>('/api/inventory/capture', { species_name, sex, is_fertile }),
   bulkCapture: (species_name: string, sex: 'F' | 'M', count: number, is_fertile = true) =>
     api.post<MuldoOut[]>('/api/inventory/bulk-capture', { species_name, sex, count, is_fertile }),
-  getPlan: (enclos_count: number, base_level: number) =>
-    api.post<PlanResult>('/api/plan', { enclos_count, base_level }),
+  getPlan: (enclos_count: number, base_level: number, optimakina = false) =>
+    api.post<PlanResult>('/api/plan', { enclos_count, base_level, optimakina }),
   submitBatch: (results: BreedRequest[]) =>
     api.post<BatchBreedResult>('/api/breed/batch', { results }),
   removeBySpecies: (species_name: string, sex: 'F' | 'M', count: number, is_fertile = true) =>

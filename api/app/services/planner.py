@@ -11,9 +11,9 @@ def compute_success_rate(base_level: int) -> float:
     return min(1.0, base_level * 0.003 + 0.30)
 
 
-async def compute_plan(db: AsyncSession, enclos_count: int, base_level: int = 0) -> dict:
+async def compute_plan(db: AsyncSession, enclos_count: int, base_level: int = 0, optimakina: bool = False) -> dict:
     capacity = enclos_count * 5
-    success_rate = compute_success_rate(base_level)
+    success_rate = min(1.0, compute_success_rate(base_level) + (0.10 if optimakina else 0))
 
     # Load optimal recipes with child species info
     recipe_rows = (
