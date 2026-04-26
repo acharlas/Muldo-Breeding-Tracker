@@ -1,15 +1,16 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { BarChart2, Package, LayoutGrid } from 'lucide-react'
+import { BarChart2, Package, LayoutGrid, History } from 'lucide-react'
 import { useCascadeStore } from '@/stores/cascade'
 
-type View = 'cascade' | 'inventaire' | 'enclos'
+type View = 'cascade' | 'inventaire' | 'enclos' | 'historique'
 
 const NAV_ITEMS: { id: View; icon: ReactNode; label: string }[] = [
   { id: 'cascade',    icon: <BarChart2 size={16} />,  label: 'Cascade' },
   { id: 'inventaire', icon: <Package size={16} />,    label: 'Inventaire' },
   { id: 'enclos',     icon: <LayoutGrid size={16} />, label: 'Enclos' },
+  { id: 'historique', icon: <History size={16} />,    label: 'Historique' },
 ]
 
 type Props = { activeView: View; onNav: (v: View) => void }

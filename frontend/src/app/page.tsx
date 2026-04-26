@@ -5,8 +5,9 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { CascadeView } from '@/components/cascade/CascadeView'
 import { InventaireView } from '@/components/inventaire/InventaireView'
 import { EnclosView } from '@/components/enclos/EnclosView'
+import { HistoriqueView } from '@/components/historique/HistoriqueView'
 
-type View = 'cascade' | 'inventaire' | 'enclos'
+type View = 'cascade' | 'inventaire' | 'enclos' | 'historique'
 
 export default function DashboardShell() {
   const [activeView, setActiveView] = useState<View>('cascade')
@@ -21,6 +22,7 @@ export default function DashboardShell() {
           {activeView === 'cascade'    && <CascadeView />}
           {activeView === 'inventaire' && <InventaireView />}
           {activeView === 'enclos'     && <EnclosView />}
+          {activeView === 'historique' && <HistoriqueView />}
         </div>
       </main>
     </div>
