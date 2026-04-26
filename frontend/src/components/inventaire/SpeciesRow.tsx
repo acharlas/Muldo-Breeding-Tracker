@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TableCell, TableRow } from '@/components/ui/table'
@@ -44,10 +43,11 @@ export function InventaireSpeciesRow({ speciesName, generation, entry }: Props) 
       <TableCell className="text-center text-muted-foreground">{safeEntry.sterile_m}</TableCell>
       <TableCell>
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger>
-            <Button variant="outline" size="sm" style={{ gap: 4 }}>
-              <Plus size={12} /> Capturer
-            </Button>
+          <PopoverTrigger style={{ display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '4px 10px', borderRadius: 6, fontSize: 12, fontWeight: 500,
+            background: 'transparent', border: '1px solid rgba(220,220,230,0.25)',
+            color: '#E5E7EB', cursor: 'pointer' }}>
+            <Plus size={12} /> Capturer
           </PopoverTrigger>
           <PopoverContent style={{ width: 200, padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', gap: 6 }}>
