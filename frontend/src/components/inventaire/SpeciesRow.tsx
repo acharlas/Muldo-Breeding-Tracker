@@ -23,9 +23,13 @@ export function InventaireSpeciesRow({ speciesName, generation, entry }: Props) 
   const [count, setCount] = useState(1)
 
   const confirm = async () => {
-    await capture(speciesName, sex, count)
-    setOpen(false)
-    setCount(1)
+    try {
+      await capture(speciesName, sex, count)
+      setOpen(false)
+      setCount(1)
+    } catch (err) {
+      console.error('Capture failed:', err)
+    }
   }
 
   const safeEntry: InventoryEntry = entry ?? { fertile_f: 0, fertile_m: 0, sterile_f: 0, sterile_m: 0 }

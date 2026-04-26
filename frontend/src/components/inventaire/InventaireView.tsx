@@ -17,7 +17,11 @@ export function InventaireView() {
   const fetchCascade = useCascadeStore((s) => s.fetch)
   const { inventory, loading, fetch } = useInventoryStore()
 
-  useEffect(() => { fetch(); fetchCascade() }, [fetch, fetchCascade])
+  useEffect(() => {
+    fetch()
+    if (cascadeItems.length === 0) fetchCascade()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetch, fetchCascade])
 
   // Build generation map from cascade store
   const genMap = useMemo(() => {

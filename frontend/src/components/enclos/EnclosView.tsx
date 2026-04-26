@@ -11,7 +11,7 @@ export function EnclosView() {
 
   const totalPairs = plan?.enclos.reduce((a, e) => a + e.pairs.length, 0) ?? 0
   const filledCount = Object.keys(results).length
-  const hasPersistedData = plan !== null && filledCount > 0
+  const hasPersistedData = plan !== null
 
   return (
     <div>

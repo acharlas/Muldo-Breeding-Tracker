@@ -28,8 +28,12 @@ export function BulkCaptureModal({ open, onClose }: { open: boolean; onClose: ()
   const toggle = (name: string) => {
     setSelected((prev) => {
       const next = new Set(prev)
-      if (next.has(name)) next.delete(name)
-      else next.add(name)
+      if (next.has(name)) {
+        next.delete(name)
+        setQty((q) => { const n = { ...q }; delete n[name]; return n })
+      } else {
+        next.add(name)
+      }
       return next
     })
   }

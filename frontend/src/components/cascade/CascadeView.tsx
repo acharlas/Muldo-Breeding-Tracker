@@ -17,8 +17,8 @@ export function CascadeView() {
   const [filterStatus, setFilterStatus] = useState<string | null>('all')
 
   const filtered = useMemo(() => items.filter((i) => {
-    if (filterGen !== 'all' && i.generation !== Number(filterGen)) return false
-    if (filterStatus !== 'all' && i.status !== filterStatus) return false
+    if (filterGen !== null && filterGen !== 'all' && i.generation !== Number(filterGen)) return false
+    if (filterStatus !== null && filterStatus !== 'all' && i.status !== filterStatus) return false
     if (search && !i.species_name.toLowerCase().includes(search.toLowerCase())) return false
     return true
   }), [items, filterGen, filterStatus, search])
