@@ -88,8 +88,18 @@ export function Sidebar({ activeView, onNav }: Props) {
               background: 'transparent', color: baseLevel <= 1 ? '#374151' : '#9CA3AF',
               cursor: baseLevel <= 1 ? 'default' : 'pointer', fontSize: 16, lineHeight: 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
-          <span style={{ flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 700,
-            color: '#E5E7EB', fontVariantNumeric: 'tabular-nums' }}>{baseLevel}</span>
+          <input
+            type="number" min={1} max={200} value={baseLevel}
+            onChange={(e) => {
+              const v = Math.max(1, Math.min(200, parseInt(e.target.value) || 1))
+              setBaseLevel(v)
+              fetch()
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{ flex: 1, textAlign: 'center', fontSize: 18, fontWeight: 700,
+              color: '#E5E7EB', fontVariantNumeric: 'tabular-nums',
+              background: 'transparent', border: 'none', outline: 'none',
+              width: 0, minWidth: 0 }} />
           <button onClick={() => changeLevel(+1)}
             style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
               background: 'transparent', color: '#9CA3AF',
