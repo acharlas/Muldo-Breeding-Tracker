@@ -40,7 +40,15 @@ export function CascadeView() {
   // Group filtered items by generation (1–10)
   const byGen: Record<number, typeof items> = {}
   for (let g = 1; g <= 10; g++) {
-    const gs = filtered.filter((i) => i.generation === g)
+    const gs = filtered
+      .filter((i) => i.generation === g)
+      .sort((a, b) => {
+        // completed species last
+        if (a.remaining === 0 && b.remaining > 0) return 1
+        if (b.remaining === 0 && a.remaining > 0) return -1
+        // among unfinished: most remaining first
+        return b.remaining - a.remaining
+      })
     if (gs.length > 0) byGen[g] = gs
   }
 
