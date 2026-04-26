@@ -53,12 +53,14 @@ class InventoryStats(BaseModel):
 class CaptureRequest(BaseModel):
     species_name: str
     sex: Literal["F", "M"]
+    is_fertile: bool = True
 
 
 class BulkCaptureRequest(BaseModel):
     species_name: str
     sex: Literal["F", "M"]
     count: int = Field(ge=1, le=500)
+    is_fertile: bool = True
 
 
 class BreedRequest(BaseModel):

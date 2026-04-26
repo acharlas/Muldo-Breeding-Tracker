@@ -28,14 +28,14 @@ async def get_inventory(db: AsyncSession = Depends(get_db)):
 
 @router.post("/capture", response_model=MuldoOut)
 async def capture(body: CaptureRequest, db: AsyncSession = Depends(get_db)):
-    muldo = await inv_svc.capture(db, body.species_name, body.sex)
+    muldo = await inv_svc.capture(db, body.species_name, body.sex, body.is_fertile)
     species = (await db.execute(select(MuldoSpecies).where(MuldoSpecies.id == muldo.species_id))).scalar_one()
     return _muldo_to_out(muldo, species)
 
 
 @router.post("/bulk-capture", response_model=list[MuldoOut])
 async def bulk_capture(body: BulkCaptureRequest, db: AsyncSession = Depends(get_db)):
-    muldos = await inv_svc.bulk_capture(db, body.species_name, body.sex, body.count)
+    muldos = await inv_svc.bulk_capture(db, body.species_name, body.sex, body.count, body.is_fertile)
     species = (await db.execute(select(MuldoSpecies).where(MuldoSpecies.name == body.species_name))).scalar_one()
     return [_muldo_to_out(m, species) for m in muldos]
 
@@ -50,9 +50,10 @@ async def remove_by_species(
     species_name: str = Query(...),
     sex: str = Query(...),
     count: int = Query(1, ge=1),
+    is_fertile: bool = Query(True),
     db: AsyncSession = Depends(get_db),
 ):
-    removed = await inv_svc.remove_by_species(db, species_name, sex, count)
+    removed = await inv_svc.remove_by_species(db, species_name, sex, count, is_fertile)
     return {"removed": removed}
 
 

@@ -41,16 +41,16 @@ export const apiCalls = {
   getCascade: () => api.get<CascadeItem[]>('/api/cascade'),
   getInventory: () => api.get<Record<string, InventoryEntry>>('/api/inventory'),
   getInventoryStats: () => api.get<InventoryStats>('/api/inventory/stats'),
-  capture: (species_name: string, sex: 'F' | 'M') =>
-    api.post<MuldoOut>('/api/inventory/capture', { species_name, sex }),
-  bulkCapture: (species_name: string, sex: 'F' | 'M', count: number) =>
-    api.post<MuldoOut[]>('/api/inventory/bulk-capture', { species_name, sex, count }),
+  capture: (species_name: string, sex: 'F' | 'M', is_fertile = true) =>
+    api.post<MuldoOut>('/api/inventory/capture', { species_name, sex, is_fertile }),
+  bulkCapture: (species_name: string, sex: 'F' | 'M', count: number, is_fertile = true) =>
+    api.post<MuldoOut[]>('/api/inventory/bulk-capture', { species_name, sex, count, is_fertile }),
   getPlan: (enclos_count: number) =>
     api.post<PlanResult>('/api/plan', { enclos_count }),
   submitBatch: (results: BreedRequest[]) =>
     api.post<BatchBreedResult>('/api/breed/batch', { results }),
-  removeBySpecies: (species_name: string, sex: 'F' | 'M', count: number) =>
+  removeBySpecies: (species_name: string, sex: 'F' | 'M', count: number, is_fertile = true) =>
     api.deleteWithStatus<{ removed: number }>(
-      `/api/inventory/by-species?species_name=${encodeURIComponent(species_name)}&sex=${sex}&count=${count}`
+      `/api/inventory/by-species?species_name=${encodeURIComponent(species_name)}&sex=${sex}&count=${count}&is_fertile=${is_fertile}`
     ),
 }

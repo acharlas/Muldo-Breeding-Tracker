@@ -7,8 +7,8 @@ type InventoryStore = {
   stats: InventoryStats | null
   loading: boolean
   fetch: () => Promise<void>
-  capture: (speciesName: string, sex: 'F' | 'M', count?: number) => Promise<void>
-  remove: (speciesName: string, sex: 'F' | 'M', count?: number) => Promise<void>
+  capture: (speciesName: string, sex: 'F' | 'M', count?: number, isFertile?: boolean) => Promise<void>
+  remove: (speciesName: string, sex: 'F' | 'M', count?: number, isFertile?: boolean) => Promise<void>
 }
 
 export const useInventoryStore = create<InventoryStore>()((set) => ({
@@ -28,11 +28,11 @@ export const useInventoryStore = create<InventoryStore>()((set) => ({
       throw e
     }
   },
-  capture: async (speciesName, sex, count = 1) => {
+  capture: async (speciesName, sex, count = 1, isFertile = true) => {
     if (count === 1) {
-      await apiCalls.capture(speciesName, sex)
+      await apiCalls.capture(speciesName, sex, isFertile)
     } else {
-      await apiCalls.bulkCapture(speciesName, sex, count)
+      await apiCalls.bulkCapture(speciesName, sex, count, isFertile)
     }
     const [inventory, stats] = await Promise.all([
       apiCalls.getInventory(),
@@ -40,8 +40,8 @@ export const useInventoryStore = create<InventoryStore>()((set) => ({
     ])
     set({ inventory, stats })
   },
-  remove: async (speciesName, sex, count = 1) => {
-    await apiCalls.removeBySpecies(speciesName, sex, count)
+  remove: async (speciesName, sex, count = 1, isFertile = true) => {
+    await apiCalls.removeBySpecies(speciesName, sex, count, isFertile)
     const [inventory, stats] = await Promise.all([
       apiCalls.getInventory(),
       apiCalls.getInventoryStats(),

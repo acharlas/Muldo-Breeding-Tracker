@@ -12,12 +12,12 @@ async def _get_species_or_404(db: AsyncSession, species_name: str) -> MuldoSpeci
     return species
 
 
-async def capture(db: AsyncSession, species_name: str, sex: str) -> MuldoIndividual:
+async def capture(db: AsyncSession, species_name: str, sex: str, is_fertile: bool = True) -> MuldoIndividual:
     species = await _get_species_or_404(db, species_name)
     muldo = MuldoIndividual(
         species_id=species.id,
         sex=SexEnum(sex),
-        is_fertile=True,
+        is_fertile=is_fertile,
         origin=OriginEnum.captured,
     )
     db.add(muldo)
@@ -27,13 +27,13 @@ async def capture(db: AsyncSession, species_name: str, sex: str) -> MuldoIndivid
     return muldo
 
 
-async def bulk_capture(db: AsyncSession, species_name: str, sex: str, count: int) -> list[MuldoIndividual]:
+async def bulk_capture(db: AsyncSession, species_name: str, sex: str, count: int, is_fertile: bool = True) -> list[MuldoIndividual]:
     species = await _get_species_or_404(db, species_name)
     muldos = [
         MuldoIndividual(
             species_id=species.id,
             sex=SexEnum(sex),
-            is_fertile=True,
+            is_fertile=is_fertile,
             origin=OriginEnum.captured,
         )
         for _ in range(count)
@@ -46,7 +46,7 @@ async def bulk_capture(db: AsyncSession, species_name: str, sex: str, count: int
     return muldos
 
 
-async def remove_by_species(db: AsyncSession, species_name: str, sex: str, count: int) -> int:
+async def remove_by_species(db: AsyncSession, species_name: str, sex: str, count: int, is_fertile: bool = True) -> int:
     species = await _get_species_or_404(db, species_name)
     rows = list(
         (await db.execute(
@@ -54,6 +54,7 @@ async def remove_by_species(db: AsyncSession, species_name: str, sex: str, count
             .where(
                 MuldoIndividual.species_id == species.id,
                 MuldoIndividual.sex == SexEnum(sex),
+                MuldoIndividual.is_fertile == is_fertile,
             )
             .order_by(MuldoIndividual.created_at.desc(), MuldoIndividual.id.desc())
             .limit(count)
