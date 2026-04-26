@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { usePlannerStore } from '@/stores/planner'
 import { useCascadeStore } from '@/stores/cascade'
@@ -20,7 +19,6 @@ function PairRow({
   const { results, setResult } = usePlannerStore()
   const key = `${enclosNum}-${index}`
   const r = results[key] as PairResult | undefined
-  const pct = Math.round(pair.success_chance * 100)
 
   const setSuccess = (success: boolean) =>
     setResult(key, {
@@ -60,7 +58,6 @@ function PairRow({
         <div style={{ flex: 1 }} />
         <Target size={13} style={{ color: '#9CA3AF' }} />
         <span style={{ fontSize: 13, color: '#D1D5DB' }}>{pair.target_child_species}</span>
-        <Badge variant="outline" style={{ fontSize: 11 }}>{pct}%</Badge>
       </div>
 
       {/* Result inputs */}

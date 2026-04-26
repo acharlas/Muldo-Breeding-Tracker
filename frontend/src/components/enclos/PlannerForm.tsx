@@ -30,12 +30,12 @@ export function PlannerForm() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Button variant="outline" size="sm"
                 onClick={() => setCount((c) => Math.max(1, c - 1))}>−</Button>
-              <Input type="number" min={1} max={10} value={count}
-                onChange={(e) => setCount(Math.min(10, Math.max(1, +e.target.value)))}
+              <Input type="number" min={1} max={6} value={count}
+                onChange={(e) => setCount(Math.min(6, Math.max(1, +e.target.value)))}
                 style={{ width: 64, textAlign: 'center', fontWeight: 700 }} />
               <Button variant="outline" size="sm"
-                onClick={() => setCount((c) => Math.min(10, c + 1))}>+</Button>
-              <span style={{ color: '#374151', fontSize: 12 }}>/ 10 max</span>
+                onClick={() => setCount((c) => Math.min(6, c + 1))}>+</Button>
+              <span style={{ color: '#374151', fontSize: 12 }}>/ 6 max</span>
             </div>
           </div>
           <div style={{ width: 1, height: 50, background: 'rgba(220,220,230,0.15)', margin: '0 6px' }} />

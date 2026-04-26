@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.models import MuldoSpecies, BreedingRecipe, MuldoIndividual, SexEnum
 from app.services.cascade import get_cascade
 
-SUCCESS_CHANCE = 0.55  # (50+50)*0.15 + 30 + 10 = 55%, level 50 + optimal bonus
+SUCCESS_CHANCE = 0.303  # base success rate
 
 
 async def compute_plan(db: AsyncSession, enclos_count: int) -> dict:
