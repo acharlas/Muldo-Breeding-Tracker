@@ -88,7 +88,7 @@ export function GenGroup({ gen, items }: { gen: number; items: CascadeItem[] }) 
               <TableHead className="text-center">Fertiles</TableHead>
               <TableHead className="text-center">Objectif</TableHead>
               <TableHead className="text-center">Restants</TableHead>
-              <TableHead>Paires dispo / Objectif</TableHead>
+              <TableHead>Progression</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
