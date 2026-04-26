@@ -101,7 +101,7 @@ class CloneLog(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     donor_1_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     donor_2_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    result_id: Mapped[int] = mapped_column(ForeignKey("muldo_individual.id"), nullable=False)
+    result_id: Mapped[Optional[int]] = mapped_column(ForeignKey("muldo_individual.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    result: Mapped["MuldoIndividual"] = relationship("MuldoIndividual", foreign_keys=[result_id])
+    result: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[result_id])
