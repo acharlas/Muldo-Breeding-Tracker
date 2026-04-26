@@ -47,13 +47,15 @@ export function CycleCard({ cycle, defaultOpen }: { cycle: CycleHistory; default
       style={{ background: 'rgba(255,255,255,0.025)',
         border: '1px solid rgba(220,220,230,0.1)', borderRadius: 12, overflow: 'hidden' }}>
 
-      <CollapsibleTrigger style={{
-        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-        padding: '14px 18px', background: 'rgba(220,220,230,0.05)',
-        borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-        borderBottom: open ? '1px solid rgba(220,220,230,0.08)' : 'none',
-        cursor: 'pointer', textAlign: 'left',
-      }}>
+      <CollapsibleTrigger
+        onMouseDown={(e) => e.preventDefault()}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+          padding: '14px 18px', background: 'rgba(220,220,230,0.05)',
+          borderTop: 'none', borderLeft: 'none', borderRight: 'none',
+          borderBottom: open ? '1px solid rgba(220,220,230,0.08)' : 'none',
+          cursor: 'pointer', textAlign: 'left',
+        }}>
         <span style={{ fontWeight: 700, fontSize: 15, color: '#E5E7EB' }}>
           Cycle {cycle.cycle_number}
         </span>

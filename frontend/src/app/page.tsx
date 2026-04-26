@@ -17,7 +17,7 @@ export default function DashboardShell() {
       color: '#E5E7EB', position: 'relative' }}>
       <Sidebar activeView={activeView} onNav={setActiveView} />
       <main style={{ marginLeft: 220, flex: 1, overflowY: 'auto',
-        position: 'relative', zIndex: 1, minHeight: '100vh' }}>
+        position: 'relative', zIndex: 1, minHeight: '100vh', overflowAnchor: 'auto' }}>
         <div style={{ padding: '32px 36px', width: '100%', boxSizing: 'border-box' }}>
           {activeView === 'cascade'    && <CascadeView />}
           {activeView === 'inventaire' && <InventaireView />}
