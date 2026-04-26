@@ -5,6 +5,7 @@ from app.routers.inventory import router as inventory_router
 from app.routers.breeding import router as breeding_router
 from app.routers.cascade import router as cascade_router
 from app.routers.planner import router as planner_router
+from app.routers.history import router as history_router
 
 app = FastAPI(title="Muldo Tracker API")
 
@@ -21,6 +22,7 @@ app.include_router(inventory_router)
 app.include_router(breeding_router)
 app.include_router(cascade_router)
 app.include_router(planner_router)
+app.include_router(history_router)
 
 
 @app.get("/")

@@ -144,3 +144,31 @@ class BatchBreedResult(BaseModel):
     clones_auto: int
     errors: list[BatchBreedError]
     updated_cascade: list[CascadeItem]
+
+
+class PairHistory(BaseModel):
+    parent_f_species: str
+    parent_m_species: str
+    child_species: str
+    child_sex: str
+    success: bool
+
+
+class CloneHistory(BaseModel):
+    species_name: str
+    sex: str
+
+
+class CycleSummary(BaseModel):
+    total: int
+    successes: int
+    fails: int
+    clones: int
+
+
+class CycleHistory(BaseModel):
+    cycle_number: int
+    date: datetime
+    pairs: list[PairHistory]
+    clones: list[CloneHistory]
+    summary: CycleSummary
