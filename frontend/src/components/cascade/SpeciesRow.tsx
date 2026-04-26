@@ -14,8 +14,8 @@ function urgencyBorder(available: number, remaining: number, progress: number): 
 }
 
 export function SpeciesRow({ item }: { item: CascadeItem }) {
-  // Gen 10 = end products (own 1); Gen 1–9 = breeding pairs (need 1F + 1M)
   const isEndProduct = item.generation >= 10
+  // For end products count total owned; for breeding stock count complete pairs
   const available = isEndProduct ? item.total_owned : Math.min(item.fertile_f, item.fertile_m)
   const progress = item.production_target > 0
     ? Math.min(100, Math.round((available / item.production_target) * 100))
