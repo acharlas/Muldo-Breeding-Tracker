@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { usePlannerStore } from '@/stores/planner'
@@ -9,7 +9,8 @@ import type { BatchBreedError, PairResult } from '@/types'
 
 export function ResultsPanel() {
   const { plan, results, setResult, submitBatch } = usePlannerStore()
-  const allSpecies = useCascadeStore((s) => s.items.map((i) => i.species_name))
+  const cascadeItems = useCascadeStore((s) => s.items)
+  const allSpecies = useMemo(() => cascadeItems.map((i) => i.species_name), [cascadeItems])
   const [errors, setErrors] = useState<BatchBreedError[]>([])
   const [networkError, setNetworkError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
