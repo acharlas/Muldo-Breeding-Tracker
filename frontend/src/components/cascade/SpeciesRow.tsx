@@ -13,7 +13,10 @@ export function SpeciesRow({ item }: { item: CascadeItem }) {
 
   return (
     <TableRow>
-      <TableCell className="font-medium text-sm">{item.species_name}</TableCell>
+      <TableCell className="font-medium text-sm"
+        style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {item.species_name}
+      </TableCell>
       <TableCell><GenBadge gen={item.generation} /></TableCell>
       <TableCell><StatusBadge status={item.status} /></TableCell>
       <TableCell className="text-center text-sm">

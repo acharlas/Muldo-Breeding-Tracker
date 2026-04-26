@@ -17,7 +17,7 @@ export default function DashboardShell() {
       <Sidebar activeView={activeView} onNav={setActiveView} />
       <main style={{ marginLeft: 220, flex: 1, overflowY: 'auto',
         position: 'relative', zIndex: 1, minHeight: '100vh' }}>
-        <div style={{ padding: '32px 36px', maxWidth: 1320 }}>
+        <div style={{ padding: '32px 36px', width: '100%', boxSizing: 'border-box' }}>
           {activeView === 'cascade'    && <CascadeView />}
           {activeView === 'inventaire' && <InventaireView />}
           {activeView === 'enclos'     && <EnclosView />}

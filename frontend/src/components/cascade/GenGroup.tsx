@@ -26,8 +26,9 @@ export function GenGroup({ gen, items }: { gen: number; items: CascadeItem[] }) 
       <CollapsibleTrigger
         style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 0,
           padding: '12px 18px', background: 'rgba(220,220,230,0.05)',
+          borderTop: 'none', borderLeft: 'none', borderRight: 'none',
           borderBottom: open ? '1px solid rgba(220,220,230,0.08)' : 'none',
-          border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+          cursor: 'pointer', textAlign: 'left' }}>
         <span style={{ color, fontWeight: 700, fontSize: 13, letterSpacing: '0.04em' }}>
           GÉNÉRATION {gen}
         </span>
@@ -42,7 +43,16 @@ export function GenGroup({ gen, items }: { gen: number; items: CascadeItem[] }) 
           transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <Table>
+        <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+          <colgroup>
+            <col style={{ width: 220 }} />
+            <col style={{ width: 64 }} />
+            <col style={{ width: 110 }} />
+            <col style={{ width: 140 }} />
+            <col style={{ width: 90 }} />
+            <col style={{ width: 90 }} />
+            <col />
+          </colgroup>
           <TableHeader>
             <TableRow style={{ fontSize: 10, color: '#374151', letterSpacing: '0.08em' }}>
               <TableHead>Espèce</TableHead>
