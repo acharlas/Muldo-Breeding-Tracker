@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Zap, Ban, Dna, X, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Dna, X, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -99,13 +98,6 @@ export function InventaireView() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speciesKeys.join(','), inventory, genMap, filterGen, search, sortKey, sortDir])
 
-  const totalFertF = speciesKeys.reduce((a, n) => a + (inventory[n]?.fertile_f ?? 0), 0)
-  const totalFertM = speciesKeys.reduce((a, n) => a + (inventory[n]?.fertile_m ?? 0), 0)
-  const totalFert  = totalFertF + totalFertM
-  const totalSterF = speciesKeys.reduce((a, n) => a + (inventory[n]?.sterile_f ?? 0), 0)
-  const totalSterM = speciesKeys.reduce((a, n) => a + (inventory[n]?.sterile_m ?? 0), 0)
-  const totalSter  = totalSterF + totalSterM
-
   return (
     <div>
       <BulkCaptureModal open={showModal} onClose={() => setShowModal(false)} />
@@ -118,30 +110,6 @@ export function InventaireView() {
           </p>
         </div>
         <Button variant="outline" onClick={() => setShowModal(true)}>+ Capture en masse</Button>
-      </div>
-
-      {/* Summary cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 24 }}>
-        {[
-          { icon: <Zap size={20} />, val: totalFert, label: 'Individus fertiles', sub: `♀ ${totalFertF} · ♂ ${totalFertM}` },
-          { icon: <Ban size={20} />, val: totalSter, label: 'Individus stériles',  sub: `♀ ${totalSterF} · ♂ ${totalSterM}` },
-          { icon: <Dna size={20} />, val: speciesKeys.length, label: 'Espèces référencées',
-            sub: `${new Set(speciesKeys.map(n => genMap.get(n)).filter((g): g is number => g !== undefined)).size} générations` },
-        ].map(({ icon, val, label, sub }) => (
-          <Card key={label} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(220,220,230,0.15)' }}>
-            <CardContent style={{ padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(220,220,230,0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E5E7EB', flexShrink: 0 }}>
-                {icon}
-              </div>
-              <div>
-                <div style={{ fontSize: 26, fontWeight: 700, color: '#E5E7EB', lineHeight: 1 }}>{val}</div>
-                <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#374151', marginTop: 2 }}>{sub}</div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       {/* Filter bar */}
