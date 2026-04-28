@@ -7,7 +7,11 @@ import { InventaireView } from '@/components/inventaire/InventaireView'
 import { EnclosView } from '@/components/enclos/EnclosView'
 import { HistoriqueView } from '@/components/historique/HistoriqueView'
 
-type View = 'cascade' | 'inventaire' | 'enclos' | 'historique'
+type View = 'cascade' | 'inventaire' | 'enclos' | 'historique' | 'dashboard' | 'parametres'
+
+// Temporarily until DashboardView and ParametresView are created in later tasks
+const DashboardView = () => <div style={{ padding: 32, color: '#9CA3AF' }}>Dashboard (coming soon)</div>
+const ParametresView = () => <div style={{ padding: 32, color: '#9CA3AF' }}>Paramètres (coming soon)</div>
 
 export default function DashboardShell() {
   const [activeView, setActiveView] = useState<View>('cascade')
@@ -23,6 +27,8 @@ export default function DashboardShell() {
           {activeView === 'inventaire' && <InventaireView />}
           {activeView === 'enclos'     && <EnclosView />}
           {activeView === 'historique' && <HistoriqueView />}
+          {activeView === 'dashboard'  && <DashboardView />}
+          {activeView === 'parametres' && <ParametresView />}
         </div>
       </main>
     </div>
