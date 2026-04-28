@@ -13,10 +13,12 @@ const SIZE_LABELS: Record<Size, string> = { '1000': 'minuscule', '2000': 'petit'
 type Props = {
   label: string
   grid: CarburantGrid
+  selectedTiers: Record<Tier, boolean>
   onChange: (tier: Tier, size: Size, value: number | null) => void
+  onTierSelect: (tier: Tier, selected: boolean) => void
 }
 
-export function CarburantGrid({ label, grid, onChange }: Props) {
+export function CarburantGrid({ label, grid, selectedTiers, onChange, onTierSelect }: Props) {
   const globalBest = bestKxpGlobal(grid)
   const rowBest = bestKxpPerRow(grid)
 
@@ -33,12 +35,13 @@ export function CarburantGrid({ label, grid, onChange }: Props) {
                   {SIZE_LABELS[s]}
                 </th>
               ))}
+              <th style={{ width: 40, textAlign: 'center', color: '#6B7280', padding: '4px 8px' }}>✓</th>
             </tr>
           </thead>
           <tbody>
             {TIERS.map(tier => (
-              <tr key={tier}>
-                <td style={{ color: '#9CA3AF', padding: '4px 8px', fontWeight: 500 }}>{TIER_LABELS[tier]}</td>
+              <tr key={tier} style={{ opacity: selectedTiers[tier] ? 1 : 0.6 }}>
+                <td style={{ color: selectedTiers[tier] ? '#E5E7EB' : '#9CA3AF', padding: '4px 8px', fontWeight: 500 }}>{TIER_LABELS[tier]}</td>
                 {SIZES.map(size => {
                   const prix = grid[tier][size]
                   const kxp = computeKxp(prix, size)
@@ -81,6 +84,14 @@ export function CarburantGrid({ label, grid, onChange }: Props) {
                     </td>
                   )
                 })}
+                <td style={{ padding: '3px 8px', textAlign: 'center' }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedTiers[tier]}
+                    onChange={(e) => onTierSelect(tier, e.target.checked)}
+                    style={{ accentColor: '#60A5FA', cursor: 'pointer', width: 14, height: 14 }}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>

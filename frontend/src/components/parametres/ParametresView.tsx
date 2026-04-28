@@ -13,9 +13,9 @@ type Size = '1000' | '2000' | '3000' | '4000' | '5000'
 export function ParametresView() {
   const {
     baseLevel, optimakina, prixFilet, prixOptimakina, nbMuldosLot,
-    carburants,
+    carburants, selectedTiers,
     setBaseLevel, setOptimakina, setPrixFilet, setPrixOptimakina, setNbMuldosLot,
-    setCarburantPrice,
+    setCarburantPrice, setTierSelected,
   } = useParametresStore()
   const fetchCascade = useCascadeStore((s) => s.fetch)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -94,7 +94,7 @@ export function ParametresView() {
   }
 
   return (
-    <div style={{ maxWidth: 1100, width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F9FAFB', marginBottom: 32 }}>Paramètres</h1>
 
       {section('Élevage', (
@@ -134,7 +134,9 @@ export function ParametresView() {
               key={jauge}
               label={JAUGE_LABELS[jauge]}
               grid={carburants[jauge]}
+              selectedTiers={selectedTiers[jauge]}
               onChange={(tier, size, prix) => setCarburantPrice(jauge, tier as Tier, size as Size, prix)}
+              onTierSelect={(tier, selected) => setTierSelected(jauge, tier as Tier, selected)}
             />
           ))}
         </div>

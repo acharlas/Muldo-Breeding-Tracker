@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useCascadeStore } from '@/stores/cascade'
 import { useHistoryStore } from '@/stores/history'
-import { useParametresStore, bestKxpGlobal, computeSuccessRate } from '@/stores/parametres'
+import { useParametresStore, effectiveKxp, computeSuccessRate } from '@/stores/parametres'
 import { apiCalls } from '@/lib/api'
 
 type Snapshot = { cycle_number: number; species_ok_count: number; created_at: string }
@@ -17,7 +17,7 @@ export function DashboardView() {
     apiCalls.getDashboardProgression().then(setSnapshots).catch(() => {})
   }, [])
 
-  const { baseLevel, optimakina, prixFilet, prixOptimakina, nbMuldosLot, carburants } = useParametresStore()
+  const { baseLevel, optimakina, prixFilet, prixOptimakina, nbMuldosLot, carburants, selectedTiers } = useParametresStore()
   const successRate = computeSuccessRate(baseLevel, optimakina)
 
   // Bloc 1 — progression
@@ -38,11 +38,11 @@ export function DashboardView() {
   const cyclesLeft = avgSuccesses > 0 ? Math.ceil(remainingTotal / avgSuccesses) : null
 
   // Bloc 3 — coût estimé
-  const fkxp = bestKxpGlobal(carburants.foudroyeur)
-  const akxp = bestKxpGlobal(carburants.abreuvoir)
-  const dkxp = bestKxpGlobal(carburants.dragofesse)
-  const bkxp = bestKxpGlobal(carburants.baffeur)
-  const ckxp = bestKxpGlobal(carburants.caresseur)
+  const fkxp = effectiveKxp(carburants.foudroyeur, selectedTiers.foudroyeur)
+  const akxp = effectiveKxp(carburants.abreuvoir, selectedTiers.abreuvoir)
+  const dkxp = effectiveKxp(carburants.dragofesse, selectedTiers.dragofesse)
+  const bkxp = effectiveKxp(carburants.baffeur, selectedTiers.baffeur)
+  const ckxp = effectiveKxp(carburants.caresseur, selectedTiers.caresseur)
   const hasAllPrices = fkxp !== null && akxp !== null && dkxp !== null && bkxp !== null && ckxp !== null
 
   const estimatedCost = useMemo(() => {
@@ -81,7 +81,7 @@ export function DashboardView() {
   )
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ width: '100%' }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F9FAFB', marginBottom: 32 }}>Dashboard</h1>
 
       {card('Progression globale', (
