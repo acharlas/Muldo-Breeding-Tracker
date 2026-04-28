@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useCascadeStore } from '@/stores/cascade'
-import { useHistoryStore } from '@/stores/history'
 import { useParametresStore, effectiveKxp, computeSuccessRate } from '@/stores/parametres'
 import { apiCalls } from '@/lib/api'
 
@@ -17,25 +16,26 @@ export function DashboardView() {
     apiCalls.getDashboardProgression().then(setSnapshots).catch(() => {})
   }, [])
 
-  const { baseLevel, optimakina, prixFilet, prixOptimakina, nbMuldosLot, carburants, selectedTiers } = useParametresStore()
+  const { baseLevel, optimakina, prixFilet, prixOptimakina, nbEnclos, carburants, selectedTiers } = useParametresStore()
   const successRate = computeSuccessRate(baseLevel, optimakina)
 
   // Bloc 1 — progression
   const ok = items.filter(i => i.status === 'ok').length
   const progressPct = Math.round((ok / 120) * 100)
 
-  // Bloc 2 — temps restant (adapt to actual history store shape)
-  const cycles = useHistoryStore((s) => s.cycles)
-  const fetchHistory = useHistoryStore((s) => s.fetch)
-  useEffect(() => { fetchHistory() }, [fetchHistory])
-
-  const avgSuccesses = useMemo(() => {
-    if (!cycles.length) return 0
-    return cycles.reduce((sum, c) => sum + (c.summary?.successes ?? 0), 0) / cycles.length
-  }, [cycles])
-
-  const remainingTotal = items.reduce((sum, i) => sum + i.remaining, 0)
-  const cyclesLeft = avgSuccesses > 0 ? Math.ceil(remainingTotal / avgSuccesses) : null
+  // Bloc 2 — temps restant
+  // total couples needed = Σ ceil(remaining / successRate) across all species
+  // pairs per cycle   = nbEnclos × 5  (10 muldos per enclos → 5 M/F pairs)
+  const { totalCouplesNeeded, cyclesLeft } = useMemo(() => {
+    const enc = nbEnclos || 1
+    const pairsPerCycle = enc * 5
+    const totalCouplesNeeded = items.reduce((sum, i) => {
+      if (i.remaining <= 0) return sum
+      return sum + Math.ceil(i.remaining / successRate)
+    }, 0)
+    const cyclesLeft = totalCouplesNeeded > 0 ? Math.ceil(totalCouplesNeeded / pairsPerCycle) : 0
+    return { totalCouplesNeeded, cyclesLeft }
+  }, [items, nbEnclos, successRate])
 
   // Bloc 3 — coût estimé
   const fkxp = effectiveKxp(carburants.foudroyeur, selectedTiers.foudroyeur)
@@ -47,7 +47,7 @@ export function DashboardView() {
 
   const estimatedCost = useMemo(() => {
     if (!hasAllPrices) return null
-    const lot = nbMuldosLot || 10
+    const lot = (nbEnclos || 1) * 10
     const fecCost = (20000 * fkxp! + 20000 * akxp! + 20000 * dkxp! + 5000 * bkxp! + 5000 * ckxp!) / lot
     let total = 0
     for (const item of items) {
@@ -58,7 +58,7 @@ export function DashboardView() {
       if (optimakina) { const po = prixOptimakina[item.generation]; if (po) total += nb * po }
     }
     return total
-  }, [items, fkxp, akxp, dkxp, bkxp, ckxp, nbMuldosLot, successRate, prixFilet, prixOptimakina, optimakina, hasAllPrices])
+  }, [items, fkxp, akxp, dkxp, bkxp, ckxp, nbEnclos, successRate, prixFilet, prixOptimakina, optimakina, hasAllPrices])
 
   // Bloc 4 — breakdown by gen
   const genData = useMemo(() => {
@@ -115,14 +115,14 @@ export function DashboardView() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
         {card('Temps restant estimé', (
-          cyclesLeft === null
-            ? <div style={{ color: '#374151', fontSize: 13 }}>Pas encore de données historiques</div>
+          cyclesLeft === 0
+            ? <div style={{ color: '#4ADE80', fontSize: 13 }}>Terminé !</div>
             : <>
               <div style={{ fontSize: 28, fontWeight: 700, color: '#F9FAFB', marginBottom: 4 }}>
                 {Math.ceil(cyclesLeft * 72 / 24)} jours
               </div>
               <div style={{ fontSize: 13, color: '#6B7280' }}>
-                ~{cyclesLeft} cycles × 72h
+                ~{cyclesLeft} cycles × 72h · {nbEnclos} enclos × 10 muldos
               </div>
             </>
         ))}

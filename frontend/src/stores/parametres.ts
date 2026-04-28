@@ -65,14 +65,14 @@ type ParametresStore = {
   optimakina: boolean
   prixFilet: number | null
   prixOptimakina: Record<number, number | null>
-  nbMuldosLot: number
+  nbEnclos: number
   carburants: Record<JaugeName, CarburantGrid>
   selectedTiers: Record<JaugeName, Record<Tier, boolean>>
   setBaseLevel: (n: number) => void
   setOptimakina: (v: boolean) => void
   setPrixFilet: (n: number | null) => void
   setPrixOptimakina: (gen: number, n: number | null) => void
-  setNbMuldosLot: (n: number) => void
+  setNbEnclos: (n: number) => void
   setCarburantPrice: (jauge: string, tier: Tier, size: Size, prix: number | null) => void
   setTierSelected: (jauge: JaugeName, tier: Tier, selected: boolean) => void
 }
@@ -84,7 +84,7 @@ export const useParametresStore = create<ParametresStore>()(
       optimakina: false,
       prixFilet: null,
       prixOptimakina: { 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null, 10: null },
-      nbMuldosLot: 10,
+      nbEnclos: 1,
       carburants: {
         foudroyeur: emptyGrid(),
         abreuvoir: emptyGrid(),
@@ -103,7 +103,7 @@ export const useParametresStore = create<ParametresStore>()(
       setOptimakina: (v) => set({ optimakina: v }),
       setPrixFilet: (n) => set({ prixFilet: n }),
       setPrixOptimakina: (gen, n) => set((s) => ({ prixOptimakina: { ...s.prixOptimakina, [gen]: n } })),
-      setNbMuldosLot: (n) => set({ nbMuldosLot: Math.max(1, Math.min(10, n)) }),
+      setNbEnclos: (n) => set({ nbEnclos: Math.max(1, n) }),
       setTierSelected: (jauge, tier, selected) =>
         set((s) => ({ selectedTiers: { ...s.selectedTiers, [jauge]: { ...s.selectedTiers[jauge], [tier]: selected } } })),
       setCarburantPrice: (jauge, tier, size, prix) =>
@@ -124,6 +124,10 @@ export const useParametresStore = create<ParametresStore>()(
       name: 'parametres-ui',
       onRehydrateStorage: () => (state) => {
         if (!state) return
+        // Migrate old nbMuldosLot → nbEnclos (derive: lot/10, minimum 1)
+        if ((state as any).nbMuldosLot !== undefined && state.nbEnclos === 1) {
+          state.nbEnclos = Math.max(1, Math.round((state as any).nbMuldosLot / 10))
+        }
         // Fill in any carburant grids that didn't exist in older persisted state
         if (!state.carburants) state.carburants = { foudroyeur: emptyGrid(), abreuvoir: emptyGrid(), dragofesse: emptyGrid(), baffeur: emptyGrid(), caresseur: emptyGrid() }
         if (!state.carburants.caresseur) state.carburants.caresseur = emptyGrid()

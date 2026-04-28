@@ -12,9 +12,9 @@ type Size = '1000' | '2000' | '3000' | '4000' | '5000'
 
 export function ParametresView() {
   const {
-    baseLevel, optimakina, prixFilet, prixOptimakina, nbMuldosLot,
+    baseLevel, optimakina, prixFilet, prixOptimakina, nbEnclos,
     carburants, selectedTiers,
-    setBaseLevel, setOptimakina, setPrixFilet, setPrixOptimakina, setNbMuldosLot,
+    setBaseLevel, setOptimakina, setPrixFilet, setPrixOptimakina, setNbEnclos,
     setCarburantPrice, setTierSelected,
   } = useParametresStore()
   const fetchCascade = useCascadeStore((s) => s.fetch)
@@ -145,7 +145,7 @@ export function ParametresView() {
       {section('Prix filet et Makinas', (
         <>
           {numInput("Prix d'un filet de capture", prixFilet, setPrixFilet, 'kamas')}
-          {numInput('Nombre de muldos par session', nbMuldosLot, (v) => setNbMuldosLot(v ?? 10), '(défaut 10)')}
+          {numInput("Nombre d'enclos", nbEnclos, (v) => setNbEnclos(v ?? 1), '× 10 muldos')}
           {optimakina && [2,3,4,5,6,7,8,9,10].map(gen => (
             <div key={gen} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
               <span style={{ fontSize: 13, color: '#9CA3AF', flex: 1 }}>Prix Optimakina — Gen {gen}</span>
