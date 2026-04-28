@@ -56,4 +56,9 @@ export const apiCalls = {
       `/api/inventory/by-species?species_name=${encodeURIComponent(species_name)}&sex=${sex}&count=${count}&is_fertile=${is_fertile}`
     ),
   getHistory: () => api.get<CycleHistory[]>('/api/history'),
+  getDashboardProgression: () =>
+    api.get<Array<{ cycle_number: number; species_ok_count: number; created_at: string }>>('/api/dashboard/progression'),
+  exportData: () => api.get<Record<string, unknown>>('/api/export'),
+  importData: (data: Record<string, unknown>, mode: 'replace' | 'merge') =>
+    api.post<{ inserted: Record<string, number> }>(`/api/import?mode=${mode}`, data),
 }
