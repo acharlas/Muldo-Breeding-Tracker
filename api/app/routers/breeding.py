@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
-from app.models.models import BreedingLog
+from app.models.models import BreedingLog, ProgressionSnapshot
 from app.schemas.schemas import (
     BreedRequest, BreedResult, MuldoOut, ClonePerformed,
     BatchBreedRequest, BatchBreedResult, BatchBreedError, CascadeItem,
@@ -49,6 +49,11 @@ async def breed_batch(body: BatchBreedRequest, db: AsyncSession = Depends(get_db
             errors.append(BatchBreedError(index=i, detail=exc.detail))
 
     cascade = await get_cascade(db)
+
+    if body.results:
+        species_ok = sum(1 for item in cascade if item["remaining"] == 0)
+        db.add(ProgressionSnapshot(cycle_number=cycle_number, species_ok_count=species_ok))
+        await db.commit()
 
     return BatchBreedResult(
         cycle_number=cycle_number,

@@ -123,3 +123,28 @@ async def test_batch_failure_does_not_corrupt_parent_fertility():
     assert len(data["errors"]) == 1  # index 0 failed
     assert data["errors"][0]["index"] == 0
     assert data["successes"] == 1    # index 1 succeeded
+
+
+@pytest.mark.asyncio
+async def test_batch_creates_progression_snapshot():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        f = await _capture(client, "Doré", "F")
+        m = await _capture(client, "Pourpre", "M")
+        await client.post("/api/breed/batch", json={"results": [
+            {"parent_f_id": f["id"], "parent_m_id": m["id"],
+             "success": True, "child_species_name": "Doré et Pourpre", "child_sex": "M"},
+        ]})
+        r = await client.get("/api/dashboard/progression")
+    assert r.status_code == 200
+    snapshots = r.json()
+    assert len(snapshots) >= 1
+    assert snapshots[-1]["species_ok_count"] >= 0
+
+
+@pytest.mark.asyncio
+async def test_empty_batch_no_snapshot():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        snapshot_before = (await client.get("/api/dashboard/progression")).json()
+        await client.post("/api/breed/batch", json={"results": []})
+        snapshot_after = (await client.get("/api/dashboard/progression")).json()
+    assert len(snapshot_after) == len(snapshot_before)
