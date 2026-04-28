@@ -8,7 +8,7 @@ type Size = '1000' | '2000' | '3000' | '4000' | '5000'
 const TIERS: Tier[] = ['extrait', 'philtre', 'potion', 'elixir']
 const SIZES: Size[] = ['1000', '2000', '3000', '4000', '5000']
 const TIER_LABELS: Record<Tier, string> = { extrait: 'Extrait', philtre: 'Philtre', potion: 'Potion', elixir: 'Élixir' }
-const SIZE_LABELS: Record<Size, string> = { '1000': '1k', '2000': '2k', '3000': '3k', '4000': '4k', '5000': '5k' }
+const SIZE_LABELS: Record<Size, string> = { '1000': 'minuscule', '2000': 'petit', '3000': 'normal', '4000': 'grand', '5000': 'gigantesque' }
 
 type Props = {
   label: string

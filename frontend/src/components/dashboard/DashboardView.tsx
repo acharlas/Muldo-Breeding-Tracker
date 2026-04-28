@@ -41,12 +41,14 @@ export function DashboardView() {
   const fkxp = bestKxpGlobal(carburants.foudroyeur)
   const akxp = bestKxpGlobal(carburants.abreuvoir)
   const dkxp = bestKxpGlobal(carburants.dragofesse)
-  const hasAllPrices = fkxp !== null && akxp !== null && dkxp !== null
+  const bkxp = bestKxpGlobal(carburants.baffeur)
+  const ckxp = bestKxpGlobal(carburants.caresseur)
+  const hasAllPrices = fkxp !== null && akxp !== null && dkxp !== null && bkxp !== null && ckxp !== null
 
   const estimatedCost = useMemo(() => {
     if (!hasAllPrices) return null
     const lot = nbMuldosLot || 10
-    const fecCost = (20000 * fkxp! + 20000 * akxp! + 20000 * dkxp!) / lot
+    const fecCost = (20000 * fkxp! + 20000 * akxp! + 20000 * dkxp! + 5000 * bkxp! + 5000 * ckxp!) / lot
     let total = 0
     for (const item of items) {
       if (item.remaining <= 0) continue
@@ -56,7 +58,7 @@ export function DashboardView() {
       if (optimakina && prixOptimakina) total += nb * prixOptimakina
     }
     return total
-  }, [items, fkxp, akxp, dkxp, nbMuldosLot, successRate, prixFilet, prixOptimakina, optimakina, hasAllPrices])
+  }, [items, fkxp, akxp, dkxp, bkxp, ckxp, nbMuldosLot, successRate, prixFilet, prixOptimakina, optimakina, hasAllPrices])
 
   // Bloc 4 — breakdown by gen
   const genData = useMemo(() => {

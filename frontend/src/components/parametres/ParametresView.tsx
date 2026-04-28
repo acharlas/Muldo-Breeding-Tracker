@@ -84,16 +84,17 @@ export function ParametresView() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  const JAUGES = ['foudroyeur', 'abreuvoir', 'dragofesse', 'baffeur'] as const
+  const JAUGES = ['foudroyeur', 'abreuvoir', 'dragofesse', 'baffeur', 'caresseur'] as const
   const JAUGE_LABELS: Record<string, string> = {
     foudroyeur: 'Foudroyeur (Endurance)',
     abreuvoir: 'Abreuvoir (Maturité)',
     dragofesse: 'Dragofesse (Amour)',
-    baffeur: 'Baffeur / Caresseur (Sérénité)',
+    baffeur: 'Baffeur (Sérénité)',
+    caresseur: 'Caresseur (Sérénité)',
   }
 
   return (
-    <div style={{ maxWidth: 780 }}>
+    <div style={{ maxWidth: 1100, width: '100%' }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F9FAFB', marginBottom: 32 }}>Paramètres</h1>
 
       {section('Élevage', (

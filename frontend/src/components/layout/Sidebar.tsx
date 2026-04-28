@@ -7,11 +7,11 @@ import { useCascadeStore } from '@/stores/cascade'
 type View = 'cascade' | 'inventaire' | 'enclos' | 'historique' | 'dashboard' | 'parametres'
 
 const NAV_ITEMS: { id: View; icon: ReactNode; label: string }[] = [
+  { id: 'dashboard' as const,  icon: <TrendingUp size={16} />,  label: 'Dashboard' },
   { id: 'cascade' as const,    icon: <BarChart2 size={16} />,   label: 'Cascade' },
   { id: 'inventaire' as const, icon: <Package size={16} />,     label: 'Inventaire' },
   { id: 'enclos' as const,     icon: <LayoutGrid size={16} />,  label: 'Enclos' },
   { id: 'historique' as const, icon: <History size={16} />,     label: 'Historique' },
-  { id: 'dashboard' as const,  icon: <TrendingUp size={16} />,  label: 'Dashboard' },
   { id: 'parametres' as const, icon: <Settings size={16} />,    label: 'Paramètres' },
 ]
 

@@ -46,7 +46,7 @@ type ParametresStore = {
   prixFilet: number | null
   prixOptimakina: number | null
   nbMuldosLot: number
-  carburants: Record<'foudroyeur' | 'abreuvoir' | 'dragofesse' | 'baffeur', CarburantGrid>
+  carburants: Record<'foudroyeur' | 'abreuvoir' | 'dragofesse' | 'baffeur' | 'caresseur', CarburantGrid>
   setBaseLevel: (n: number) => void
   setOptimakina: (v: boolean) => void
   setPrixFilet: (n: number | null) => void
@@ -68,6 +68,7 @@ export const useParametresStore = create<ParametresStore>()(
         abreuvoir: emptyGrid(),
         dragofesse: emptyGrid(),
         baffeur: emptyGrid(),
+        caresseur: emptyGrid(),
       },
       setBaseLevel: (n) => set({ baseLevel: Math.max(1, Math.min(200, n)) }),
       setOptimakina: (v) => set({ optimakina: v }),
