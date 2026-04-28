@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.models import MuldoIndividual, BreedingLog, CloneLog, ProgressionSnapshot
 
@@ -42,9 +42,14 @@ async def import_replace(db: AsyncSession, data: dict) -> dict:
 
     counts = {}
     for row in data.get("inventory", []):
-        fields = _deserialize_row({k: v for k, v in row.items() if k != "id"}, {"created_at"})
+        # Keep original id so parent_f_id/parent_m_id references stay valid
+        fields = _deserialize_row(row, {"created_at"})
         db.add(MuldoIndividual(**fields))
     counts["inventory"] = len(data.get("inventory", []))
+
+    if counts["inventory"] > 0:
+        max_id = max(row["id"] for row in data["inventory"])
+        await db.execute(text(f"SELECT setval('muldo_individual_id_seq', {max_id})"))
 
     for row in data.get("breeding_log", []):
         fields = _deserialize_row({k: v for k, v in row.items() if k != "id"}, {"created_at"})
@@ -68,6 +73,8 @@ async def import_replace(db: AsyncSession, data: dict) -> dict:
 async def import_merge(db: AsyncSession, data: dict) -> dict:
     counts = {}
     id_map: dict[int, int] = {}
+
+    # Pass 1: insert without parent refs
     for row in data.get("inventory", []):
         old_id = row["id"]
         fields = _deserialize_row({k: v for k, v in row.items() if k not in ("id", "parent_f_id", "parent_m_id")}, {"created_at"})
@@ -76,6 +83,18 @@ async def import_merge(db: AsyncSession, data: dict) -> dict:
         await db.flush()
         id_map[old_id] = obj.id
     counts["inventory"] = len(id_map)
+
+    # Pass 2: update parent refs using id_map
+    for row in data.get("inventory", []):
+        old_id = row["id"]
+        new_id = id_map[old_id]
+        pf = id_map.get(row.get("parent_f_id")) if row.get("parent_f_id") else None
+        pm = id_map.get(row.get("parent_m_id")) if row.get("parent_m_id") else None
+        if pf is not None or pm is not None:
+            await db.execute(
+                text("UPDATE muldo_individual SET parent_f_id=:pf, parent_m_id=:pm WHERE id=:id"),
+                {"pf": pf, "pm": pm, "id": new_id}
+            )
 
     for row in data.get("breeding_log", []):
         fields = _deserialize_row({k: v for k, v in row.items() if k != "id"}, {"created_at"})
