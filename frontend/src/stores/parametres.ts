@@ -44,13 +44,13 @@ type ParametresStore = {
   baseLevel: number
   optimakina: boolean
   prixFilet: number | null
-  prixOptimakina: number | null
+  prixOptimakina: Record<number, number | null>
   nbMuldosLot: number
   carburants: Record<'foudroyeur' | 'abreuvoir' | 'dragofesse' | 'baffeur' | 'caresseur', CarburantGrid>
   setBaseLevel: (n: number) => void
   setOptimakina: (v: boolean) => void
   setPrixFilet: (n: number | null) => void
-  setPrixOptimakina: (n: number | null) => void
+  setPrixOptimakina: (gen: number, n: number | null) => void
   setNbMuldosLot: (n: number) => void
   setCarburantPrice: (jauge: string, tier: Tier, size: Size, prix: number | null) => void
 }
@@ -61,7 +61,7 @@ export const useParametresStore = create<ParametresStore>()(
       baseLevel: 1,
       optimakina: false,
       prixFilet: null,
-      prixOptimakina: null,
+      prixOptimakina: { 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null, 10: null },
       nbMuldosLot: 10,
       carburants: {
         foudroyeur: emptyGrid(),
@@ -73,7 +73,7 @@ export const useParametresStore = create<ParametresStore>()(
       setBaseLevel: (n) => set({ baseLevel: Math.max(1, Math.min(200, n)) }),
       setOptimakina: (v) => set({ optimakina: v }),
       setPrixFilet: (n) => set({ prixFilet: n }),
-      setPrixOptimakina: (n) => set({ prixOptimakina: n }),
+      setPrixOptimakina: (gen, n) => set((s) => ({ prixOptimakina: { ...s.prixOptimakina, [gen]: n } })),
       setNbMuldosLot: (n) => set({ nbMuldosLot: Math.max(1, Math.min(10, n)) }),
       setCarburantPrice: (jauge, tier, size, prix) =>
         set((s) => ({
@@ -96,6 +96,7 @@ export const useParametresStore = create<ParametresStore>()(
         // Fill in any carburant grids that didn't exist in older persisted state
         if (!state.carburants) state.carburants = { foudroyeur: emptyGrid(), abreuvoir: emptyGrid(), dragofesse: emptyGrid(), baffeur: emptyGrid(), caresseur: emptyGrid() }
         if (!state.carburants.caresseur) state.carburants.caresseur = emptyGrid()
+        if (!state.prixOptimakina || typeof state.prixOptimakina !== 'object') state.prixOptimakina = { 2: null, 3: null, 4: null, 5: null, 6: null, 7: null, 8: null, 9: null, 10: null }
         if (typeof window !== 'undefined') {
           const old = localStorage.getItem('muldo-settings')
           if (old) {

@@ -144,7 +144,19 @@ export function ParametresView() {
         <>
           {numInput("Prix d'un filet de capture", prixFilet, setPrixFilet, 'kamas')}
           {numInput('Nombre de muldos par session', nbMuldosLot, (v) => setNbMuldosLot(v ?? 10), '(défaut 10)')}
-          {optimakina && numInput("Prix d'une Optimakina", prixOptimakina, setPrixOptimakina, 'kamas')}
+          {optimakina && [2,3,4,5,6,7,8,9,10].map(gen => (
+            <div key={gen} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <span style={{ fontSize: 13, color: '#9CA3AF', flex: 1 }}>Prix Optimakina — Gen {gen}</span>
+              <input
+                type="number" min={0} placeholder="—"
+                value={prixOptimakina[gen] ?? ''}
+                onChange={(e) => setPrixOptimakina(gen, e.target.value === '' ? null : parseFloat(e.target.value))}
+                style={{ width: 120, background: 'rgba(220,220,230,0.05)', border: '1px solid rgba(220,220,230,0.12)',
+                  borderRadius: 6, padding: '6px 10px', color: '#E5E7EB', fontSize: 13, outline: 'none' }}
+              />
+              <span style={{ fontSize: 11, color: '#4B5563' }}>kamas</span>
+            </div>
+          ))}
         </>
       ))}
 

@@ -55,7 +55,7 @@ export function DashboardView() {
       const nb = Math.ceil(item.remaining / successRate)
       total += nb * 2 * fecCost
       if (item.generation === 1 && prixFilet) total += nb * 2 * prixFilet
-      if (optimakina && prixOptimakina) total += nb * prixOptimakina
+      if (optimakina) { const po = prixOptimakina[item.generation]; if (po) total += nb * po }
     }
     return total
   }, [items, fkxp, akxp, dkxp, bkxp, ckxp, nbMuldosLot, successRate, prixFilet, prixOptimakina, optimakina, hasAllPrices])
