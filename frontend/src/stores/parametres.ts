@@ -92,9 +92,13 @@ export const useParametresStore = create<ParametresStore>()(
     {
       name: 'parametres-ui',
       onRehydrateStorage: () => (state) => {
+        if (!state) return
+        // Fill in any carburant grids that didn't exist in older persisted state
+        if (!state.carburants) state.carburants = { foudroyeur: emptyGrid(), abreuvoir: emptyGrid(), dragofesse: emptyGrid(), baffeur: emptyGrid(), caresseur: emptyGrid() }
+        if (!state.carburants.caresseur) state.carburants.caresseur = emptyGrid()
         if (typeof window !== 'undefined') {
           const old = localStorage.getItem('muldo-settings')
-          if (old && state) {
+          if (old) {
             try {
               const parsed = JSON.parse(old)
               if (parsed?.state?.baseLevel !== undefined) state.baseLevel = parsed.state.baseLevel
