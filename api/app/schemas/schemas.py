@@ -182,3 +182,15 @@ class ProgressionSnapshotOut(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ExportData(BaseModel):
+    exported_at: datetime
+    inventory: list[dict]
+    breeding_log: list[dict]
+    clone_log: list[dict]
+    progression_snapshot: list[dict]
+
+
+class ImportResult(BaseModel):
+    inserted: dict[str, int]
