@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { Download, Upload, FileText } from 'lucide-react'
+import { Download, FileText } from 'lucide-react'
 import { useParametresStore, successPct } from '@/stores/parametres'
 import { useCascadeStore } from '@/stores/cascade'
 import { apiCalls } from '@/lib/api'
