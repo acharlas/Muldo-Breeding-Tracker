@@ -22,8 +22,8 @@ export const useCascadeStore = create<CascadeStore>()(
       fetch: async () => {
         set({ loading: true, error: null })
         try {
-          const { useSettingsStore } = await import('./settings')
-          const { baseLevel, optimakina } = useSettingsStore.getState()
+          const { useParametresStore } = await import('./parametres')
+          const { baseLevel, optimakina } = useParametresStore.getState()
           const items = await apiCalls.getCascade(baseLevel, optimakina)
           set({ items, loading: false })
         } catch (e) {

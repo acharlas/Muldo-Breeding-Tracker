@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { BarChart2, Package, LayoutGrid, History } from 'lucide-react'
 import { useCascadeStore } from '@/stores/cascade'
-import { useSettingsStore, successPct } from '@/stores/settings'
+import { useParametresStore, successPct } from '@/stores/parametres'
 
 type View = 'cascade' | 'inventaire' | 'enclos' | 'historique'
 
@@ -19,7 +19,7 @@ type Props = { activeView: View; onNav: (v: View) => void }
 export function Sidebar({ activeView, onNav }: Props) {
   const items = useCascadeStore((s) => s.items)
   const fetch = useCascadeStore((s) => s.fetch)
-  const { baseLevel, setBaseLevel, optimakina, setOptimakina } = useSettingsStore()
+  const { baseLevel, setBaseLevel, optimakina, setOptimakina } = useParametresStore()
 
   const changeLevel = (delta: number) => {
     const next = Math.max(1, Math.min(200, baseLevel + delta))
