@@ -13,7 +13,7 @@ async def isolate_db():
     """
     async with AsyncSessionLocal() as session:
         await session.execute(text(
-            "TRUNCATE TABLE clone_log, breeding_log, muldo_individual RESTART IDENTITY CASCADE"
+            "TRUNCATE TABLE progression_snapshot, clone_log, breeding_log, muldo_individual RESTART IDENTITY CASCADE"
         ))
         await session.commit()
 
