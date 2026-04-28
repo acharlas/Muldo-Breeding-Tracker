@@ -96,7 +96,7 @@ export const useParametresStore = create<ParametresStore>()(
           if (old && state) {
             try {
               const parsed = JSON.parse(old)
-              if (parsed?.state?.baseLevel && !state.baseLevel) state.baseLevel = parsed.state.baseLevel
+              if (parsed?.state?.baseLevel !== undefined) state.baseLevel = parsed.state.baseLevel
               if (parsed?.state?.optimakina !== undefined) state.optimakina = parsed.state.optimakina
               localStorage.removeItem('muldo-settings')
             } catch {}
