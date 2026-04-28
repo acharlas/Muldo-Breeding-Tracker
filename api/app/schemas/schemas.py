@@ -174,3 +174,11 @@ class CycleHistory(BaseModel):
     pairs: list[PairHistory]
     clones: list[CloneHistory]
     summary: CycleSummary
+
+
+class ProgressionSnapshotOut(BaseModel):
+    cycle_number: int
+    species_ok_count: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}

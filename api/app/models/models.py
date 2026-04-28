@@ -111,3 +111,12 @@ class CloneLog(Base):
     sex: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     result: Mapped[Optional["MuldoIndividual"]] = relationship("MuldoIndividual", foreign_keys=[result_id])
+
+
+class ProgressionSnapshot(Base):
+    __tablename__ = "progression_snapshot"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    cycle_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    species_ok_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
