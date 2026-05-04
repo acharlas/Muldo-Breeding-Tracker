@@ -71,7 +71,7 @@ def compute_cascade(
         else:
             status = "a_faire"
 
-        expected_f = round(t * 0.66)
+        expected_f = round(t * 0.5)
         result.append({
             "species_name": species.name,
             "generation": gen,

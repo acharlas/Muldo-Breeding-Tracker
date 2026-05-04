@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef } from 'react'
-import { Download, FileText } from 'lucide-react'
-import { useParametresStore, successPct } from '@/stores/parametres'
+import { useRef, useState } from 'react'
+import { Download, FileText, ChevronDown, ChevronRight } from 'lucide-react'
+import { useParametresStore, successPct, totalXpToReach } from '@/stores/parametres'
 import { useCascadeStore } from '@/stores/cascade'
 import { apiCalls } from '@/lib/api'
 import { CarburantGrid as CarburantGridComponent } from './CarburantGrid'
@@ -12,13 +12,34 @@ type Size = '1000' | '2000' | '3000' | '4000' | '5000'
 
 export function ParametresView() {
   const {
-    baseLevel, optimakina, prixFilet, prixOptimakina, nbEnclos,
+    baseLevel, optimakina, prixFilet, prixOptimakina, nbEnclos, heuresAccouplement,
     carburants, selectedTiers,
-    setBaseLevel, setOptimakina, setPrixFilet, setPrixOptimakina, setNbEnclos,
+    setBaseLevel, setOptimakina, setPrixFilet, setPrixOptimakina, setNbEnclos, setHeuresAccouplement,
     setCarburantPrice, setTierSelected,
   } = useParametresStore()
   const fetchCascade = useCascadeStore((s) => s.fetch)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [carburantsOpen, setCarburantsOpen] = useState(false)
+  const [optimakinaOpen, setOptimakinaOpen] = useState(false)
+
+  const collapsible = (title: string, open: boolean, toggle: () => void, children: React.ReactNode) => (
+    <div style={{ marginBottom: 24 }}>
+      <button
+        onClick={toggle}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+          fontSize: 11, color: '#6B7280', letterSpacing: '0.1em', textTransform: 'uppercase',
+          background: 'none', border: 'none', borderBottom: '1px solid rgba(220,220,230,0.08)',
+          paddingBottom: 8, marginBottom: open ? 16 : 0, cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+        {title}
+      </button>
+      {open && children}
+    </div>
+  )
 
   const section = (title: string, children: React.ReactNode) => (
     <div style={{ marginBottom: 32 }}>
@@ -84,50 +105,115 @@ export function ParametresView() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  const JAUGES = ['foudroyeur', 'abreuvoir', 'dragofesse', 'baffeur', 'caresseur'] as const
+  const JAUGES = ['foudroyeur', 'abreuvoir', 'dragofesse', 'baffeur', 'caresseur', 'experience'] as const
   const JAUGE_LABELS: Record<string, string> = {
     foudroyeur: 'Foudroyeur (Endurance)',
     abreuvoir: 'Abreuvoir (Maturité)',
     dragofesse: 'Dragofesse (Amour)',
     baffeur: 'Baffeur (Sérénité)',
     caresseur: 'Caresseur (Sérénité)',
+    experience: 'Expérience (XP)',
   }
+  const totalXp = Math.round(totalXpToReach(baseLevel))
+  const JAUGE_TARGETS: Record<string, number> = {
+    foudroyeur: 20000,
+    abreuvoir: 20000,
+    dragofesse: 20000,
+    baffeur: 5000,
+    caresseur: 5000,
+    experience: totalXp,
+  }
+
+  const statBox = (label: string, children: React.ReactNode) => (
+    <div style={{
+      flex: 1, background: 'rgba(220,220,230,0.05)', border: '1px solid rgba(220,220,230,0.12)',
+      borderRadius: 10, padding: '14px 18px',
+    }}>
+      <div style={{ fontSize: 11, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+        {label}
+      </div>
+      {children}
+    </div>
+  )
 
   return (
     <div style={{ width: '100%' }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F9FAFB', marginBottom: 32 }}>Paramètres</h1>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F9FAFB', marginBottom: 24 }}>Paramètres</h1>
 
-      {section('Élevage', (
-        <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <span style={{ fontSize: 13, color: '#9CA3AF', flex: 1 }}>Niveau parents</span>
-            <button onClick={() => { setBaseLevel(baseLevel - 1); fetchCascade() }}
-              disabled={baseLevel <= 1}
-              style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
-                background: 'transparent', color: '#9CA3AF', cursor: 'pointer', fontSize: 16 }}>−</button>
-            <input type="number" min={1} max={200} value={baseLevel}
-              onChange={(e) => { setBaseLevel(parseInt(e.target.value) || 1); fetchCascade() }}
-              style={{ width: 70, textAlign: 'center', background: 'rgba(220,220,230,0.05)',
-                border: '1px solid rgba(220,220,230,0.12)', borderRadius: 6, padding: '6px 10px',
-                color: '#E5E7EB', fontSize: 14, fontWeight: 700, outline: 'none' }} />
-            <button onClick={() => { setBaseLevel(baseLevel + 1); fetchCascade() }}
-              style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
-                background: 'transparent', color: '#9CA3AF', cursor: 'pointer', fontSize: 16 }}>+</button>
-            <span style={{ fontSize: 12, color: '#9CA3AF', marginLeft: 8 }}>
+      {/* Top boxes — Niveau parents + Nombre d'enclos */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 32 }}>
+        {statBox('Niveau parents', (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => { setBaseLevel(baseLevel - 1); fetchCascade() }}
+                disabled={baseLevel <= 1}
+                style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
+                  background: 'transparent', color: '#9CA3AF', cursor: 'pointer', fontSize: 16 }}>−</button>
+              <input type="number" min={1} max={200} value={baseLevel}
+                onChange={(e) => { setBaseLevel(parseInt(e.target.value) || 1); fetchCascade() }}
+                style={{ width: 64, textAlign: 'center', background: 'rgba(220,220,230,0.05)',
+                  border: '1px solid rgba(220,220,230,0.12)', borderRadius: 6, padding: '6px 10px',
+                  color: '#E5E7EB', fontSize: 18, fontWeight: 700, outline: 'none' }} />
+              <button onClick={() => { setBaseLevel(baseLevel + 1); fetchCascade() }}
+                style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
+                  background: 'transparent', color: '#9CA3AF', cursor: 'pointer', fontSize: 16 }}>+</button>
+            </div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>
               {successPct(baseLevel, optimakina)}% succès
-            </span>
-          </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13,
-            color: optimakina ? '#A78BFA' : '#9CA3AF', cursor: 'pointer' }}>
-            <input type="checkbox" checked={optimakina}
-              onChange={(e) => { setOptimakina(e.target.checked); fetchCascade() }}
-              style={{ accentColor: '#A78BFA' }} />
-            Optimakina (+10%)
-          </label>
-        </>
-      ))}
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12,
+              color: optimakina ? '#A78BFA' : '#9CA3AF', cursor: 'pointer', marginTop: 10 }}>
+              <input type="checkbox" checked={optimakina}
+                onChange={(e) => { setOptimakina(e.target.checked); fetchCascade() }}
+                style={{ accentColor: '#A78BFA' }} />
+              Optimakina (+10%)
+            </label>
+          </>
+        ))}
 
-      {section('Prix marché — Carburants', (
+        {statBox('Nombre d\'enclos', (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => setNbEnclos(nbEnclos - 1)}
+                disabled={nbEnclos <= 1}
+                style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
+                  background: 'transparent', color: '#9CA3AF', cursor: 'pointer', fontSize: 16 }}>−</button>
+              <input type="number" min={1} value={nbEnclos}
+                onChange={(e) => setNbEnclos(parseInt(e.target.value) || 1)}
+                style={{ width: 64, textAlign: 'center', background: 'rgba(220,220,230,0.05)',
+                  border: '1px solid rgba(220,220,230,0.12)', borderRadius: 6, padding: '6px 10px',
+                  color: '#E5E7EB', fontSize: 18, fontWeight: 700, outline: 'none' }} />
+              <button onClick={() => setNbEnclos(nbEnclos + 1)}
+                style={{ width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(220,220,230,0.2)',
+                  background: 'transparent', color: '#9CA3AF', cursor: 'pointer', fontSize: 16 }}>+</button>
+            </div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>
+              {nbEnclos * 10} muldos · {nbEnclos * 5} paires/cycle
+            </div>
+          </>
+        ))}
+
+        {statBox('Heures entre accouplements', (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input
+                type="number" min={1} placeholder="—"
+                value={heuresAccouplement ?? ''}
+                onChange={(e) => setHeuresAccouplement(e.target.value === '' ? null : parseFloat(e.target.value))}
+                style={{ width: 80, textAlign: 'center', background: 'rgba(220,220,230,0.05)',
+                  border: '1px solid rgba(220,220,230,0.12)', borderRadius: 6, padding: '6px 10px',
+                  color: '#E5E7EB', fontSize: 18, fontWeight: 700, outline: 'none' }} />
+              <span style={{ fontSize: 13, color: '#9CA3AF' }}>h</span>
+            </div>
+            <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>
+              {heuresAccouplement ? `${Math.ceil(heuresAccouplement / 24 * 10) / 10}j par cycle` : 'Durée d\'un cycle'}
+            </div>
+          </>
+        ))}
+      </div>
+
+      {/* Carburants — collapsible */}
+      {collapsible('Prix marché — Carburants', carburantsOpen, () => setCarburantsOpen(v => !v), (
         <div>
           {JAUGES.map(jauge => (
             <CarburantGridComponent
@@ -137,18 +223,22 @@ export function ParametresView() {
               selectedTiers={selectedTiers[jauge]}
               onChange={(tier, size, prix) => setCarburantPrice(jauge, tier as Tier, size as Size, prix)}
               onTierSelect={(tier, selected) => setTierSelected(jauge, tier as Tier, selected)}
+              xpMode={jauge === 'experience'}
+              target={JAUGE_TARGETS[jauge]}
             />
           ))}
         </div>
       ))}
 
-      {section('Prix filet et Makinas', (
-        <>
-          {numInput("Prix d'un filet de capture", prixFilet, setPrixFilet, 'kamas')}
-          {numInput("Nombre d'enclos", nbEnclos, (v) => setNbEnclos(v ?? 1), '× 10 muldos')}
-          {optimakina && [2,3,4,5,6,7,8,9,10].map(gen => (
+      {/* Prix filet */}
+      {section('Prix filet', numInput("Prix d'un filet de capture", prixFilet, setPrixFilet, 'kamas'))}
+
+      {/* Optimakina prices — collapsible, only if optimakina enabled */}
+      {optimakina && collapsible('Prix Optimakina par génération', optimakinaOpen, () => setOptimakinaOpen(v => !v), (
+        <div>
+          {[2,3,4,5,6,7,8,9,10].map(gen => (
             <div key={gen} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-              <span style={{ fontSize: 13, color: '#9CA3AF', flex: 1 }}>Prix Optimakina — Gen {gen}</span>
+              <span style={{ fontSize: 13, color: '#9CA3AF', flex: 1 }}>Génération {gen}</span>
               <input
                 type="number" min={0} placeholder="—"
                 value={prixOptimakina[gen] ?? ''}
@@ -159,9 +249,10 @@ export function ParametresView() {
               <span style={{ fontSize: 11, color: '#4B5563' }}>kamas</span>
             </div>
           ))}
-        </>
+        </div>
       ))}
 
+      {/* Export / Import */}
       {section('Export / Import', (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>

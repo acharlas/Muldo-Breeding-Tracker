@@ -1,0 +1,26 @@
+# .claudeignore
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+coverage/
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+__snapshots__/
+.jest-cache/
+
+# Database files
+*.sqlite
+*.db
+dump.sql
+
+# Large data files
+data/
+datasets/
+*.csv
+*.json.gz

@@ -186,15 +186,6 @@ export function EnclosView() {
         </p>
       </div>
 
-      {hasPersistedData && (
-        <div style={{ padding: '10px 16px', borderRadius: 8,
-          background: 'rgba(220,220,230,0.07)', border: '1px solid rgba(220,220,230,0.18)',
-          fontSize: 13, color: '#9CA3AF' }}>
-          Session en cours — {filledCount} résultat{filledCount !== 1 ? 's' : ''} saisi{filledCount !== 1 ? 's' : ''} sur {totalPairs}.
-          Continuez ci-dessous ou régénérez un plan.
-        </div>
-      )}
-
       <PlannerForm />
 
       {submitResult && (
@@ -321,11 +312,9 @@ export function EnclosView() {
           </div>
 
           {/* Current enclos card */}
-          <Card style={{ background: 'rgba(255,255,255,0.025)',
-            border: '1px solid rgba(220,220,230,0.13)', overflow: 'hidden' }}>
+          <Card>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 20px', borderBottom: '1px solid rgba(220,220,230,0.08)',
-              background: 'rgba(220,220,230,0.05)' }}>
+              padding: '14px 20px', borderBottom: '1px solid rgba(220,220,230,0.08)' }}>
               <span style={{ fontSize: 16, fontWeight: 700, color: '#E5E7EB' }}>
                 Enclos {currentEnclos.enclos_number}
               </span>
@@ -335,7 +324,7 @@ export function EnclosView() {
                 } / {currentEnclos.pairs.length} paires saisies
               </span>
             </div>
-            <CardContent style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <CardContent style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {currentEnclos.pairs.map((pair, pairIdx) => (
                 <PairRow
                   key={`${pair.parent_f.id}-${pair.parent_m.id}`}

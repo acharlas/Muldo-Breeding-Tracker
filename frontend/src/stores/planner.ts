@@ -6,9 +6,7 @@ import { apiCalls } from '@/lib/api'
 type PlannerStore = {
   plan: PlanResult | null
   results: Record<string, PairResult>
-  enclosCount: number
   loading: boolean
-  setEnclosCount: (n: number) => void
   generate: () => Promise<void>
   setResult: (key: string, result: PairResult) => void
   submitBatch: () => Promise<BatchBreedResult>
@@ -20,15 +18,11 @@ export const usePlannerStore = create<PlannerStore>()(
     (set, get) => ({
       plan: null,
       results: {},
-      enclosCount: 4,
       loading: false,
 
-      setEnclosCount: (n) => set({ enclosCount: Math.min(6, Math.max(1, n)) }),
-
       generate: async () => {
-        const { enclosCount } = get()
         const { useParametresStore } = await import('./parametres')
-        const { baseLevel, optimakina } = useParametresStore.getState()
+        const { baseLevel, optimakina, nbEnclos: enclosCount } = useParametresStore.getState()
         set({ loading: true })
         try {
           const plan = await apiCalls.getPlan(enclosCount, baseLevel, optimakina)
@@ -81,7 +75,7 @@ export const usePlannerStore = create<PlannerStore>()(
     }),
     {
       name: 'muldo-planner',
-      partialize: (state) => ({ plan: state.plan, results: state.results, enclosCount: state.enclosCount }),
+      partialize: (state) => ({ plan: state.plan, results: state.results }),
     }
   )
 )
